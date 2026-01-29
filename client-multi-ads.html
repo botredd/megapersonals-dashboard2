@@ -1093,19 +1093,16 @@
             if (captchaCheckInterval) clearInterval(captchaCheckInterval);
             if (editStatusCheckInterval) clearInterval(editStatusCheckInterval);
             
-            // Limpiar estado de editando si quedó colgado
+            // SIEMPRE limpiar estado de editando al cerrar
             if (currentEditAdId) {
                 try {
-                    const res = await fetch(`${FIREBASE_URL}/clients/${currentEditAdId}.json`);
-                    const data = await res.json();
-                    if (data && data.editStatus === 'editing') {
-                        await fetch(`${FIREBASE_URL}/clients/${currentEditAdId}.json`, {
-                            method: 'PATCH',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ editStatus: null })
-                        });
-                        await fetch(`${FIREBASE_URL}/editRequests/${currentEditAdId}.json`, { method: 'DELETE' });
-                    }
+                    await fetch(`${FIREBASE_URL}/clients/${currentEditAdId}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ editStatus: null })
+                    });
+                    await fetch(`${FIREBASE_URL}/editRequests/${currentEditAdId}.json`, { method: 'DELETE' });
+                    console.log('✅ Estado de edición limpiado');
                 } catch (e) {
                     console.error('Error limpiando:', e);
                 }
@@ -1296,7 +1293,14 @@
                     const res = await fetch(`${FIREBASE_URL}/editRequests/${adId}.json`);
                     const data = await res.json();
                     
-                    if (data && data.status === 'completed') {
+                    // Si no hay datos, limpiar y mostrar error
+                    if (!data) {
+                        clearInterval(editStatusCheckInterval);
+                        showEditResultWithRetry(adId);
+                        return;
+                    }
+                    
+                    if (data.status === 'completed') {
                         clearInterval(editStatusCheckInterval);
                         showEditResult(true, '¡Tu anuncio ha sido actualizado correctamente!');
                         
@@ -1307,30 +1311,39 @@
                         return;
                     }
                     
-                    if (data && data.status === 'error') {
+                    if (data.status === 'error') {
                         clearInterval(editStatusCheckInterval);
                         showEditResult(false, data.errorMessage || 'Error al actualizar el anuncio');
                         return;
                     }
                     
                     // Si está esperando para publicar, mostrar el tiempo restante
-                    if (data && data.status === 'waiting_to_publish' && data.publishAt) {
+                    if (data.status === 'waiting_to_publish' && data.publishAt) {
                         isWaitingToPublish = true;
                         const now = Date.now();
                         const timeLeft = Math.max(0, data.publishAt - now);
                         const minutes = Math.floor(timeLeft / 60000);
                         const seconds = Math.floor((timeLeft % 60000) / 1000);
                         
-                        document.getElementById('resultTitle').textContent = '⏳ Esperando...';
-                        document.getElementById('editResult').innerHTML = `
-                            <p>Tu anuncio está listo para publicarse.</p>
-                            <p style="font-size: 1.5em; color: #ff69b4; margin: 15px 0;">
-                                ⏱️ ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}
-                            </p>
-                            <p style="font-size: 0.85em; color: #999;">
-                                El anuncio se publicará automáticamente<br>cuando llegue el momento programado.
-                            </p>
-                        `;
+                        // Si el tiempo llegó a 0, seguir esperando el completed
+                        if (timeLeft <= 0) {
+                            document.getElementById('resultTitle').textContent = '🚀 Publicando...';
+                            document.getElementById('editResult').innerHTML = `
+                                <div class="spinner"></div>
+                                <p>Publicando tu anuncio...</p>
+                            `;
+                        } else {
+                            document.getElementById('resultTitle').textContent = '⏳ Esperando...';
+                            document.getElementById('editResult').innerHTML = `
+                                <p>Tu anuncio está listo para publicarse.</p>
+                                <p style="font-size: 1.5em; color: #ff69b4; margin: 15px 0;">
+                                    ⏱️ ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}
+                                </p>
+                                <p style="font-size: 0.85em; color: #999;">
+                                    El anuncio se publicará automáticamente<br>cuando llegue el momento programado.
+                                </p>
+                            `;
+                        }
                         return;
                     }
                     
