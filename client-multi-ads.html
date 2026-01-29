@@ -1100,19 +1100,27 @@
             const state = document.getElementById('editState').value;
             const city = document.getElementById('editCity').value;
             
-            if (!state || !city) {
-                alert('Por favor selecciona un estado y una ciudad');
+            // Obtener valores
+            const adName = document.getElementById('editName').value.trim();
+            const adHeadline = document.getElementById('editHeadline').value.trim();
+            const adBody = document.getElementById('editBody').value.trim();
+            const adLocation = document.getElementById('editLocation').value.trim();
+            
+            // Solo incluir campos que tienen valor (no vacíos)
+            const editData = {};
+            
+            if (adName) editData.adName = adName;
+            if (adHeadline) editData.adHeadline = adHeadline;
+            if (adBody) editData.adBody = adBody;
+            if (state) editData.adState = state;
+            if (city) editData.city = city;
+            if (adLocation) editData.adLocation = adLocation;
+            
+            // Verificar que al menos haya algo para editar
+            if (Object.keys(editData).length === 0) {
+                alert('Por favor llena al menos un campo para editar');
                 return;
             }
-            
-            const editData = {
-                adName: document.getElementById('editName').value.trim(),
-                adHeadline: document.getElementById('editHeadline').value.trim(),
-                adBody: document.getElementById('editBody').value.trim(),
-                adState: state,
-                city: city,
-                adLocation: document.getElementById('editLocation').value.trim()
-            };
             
             try {
                 // Crear solicitud de edición en Firebase
