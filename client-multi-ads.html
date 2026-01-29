@@ -1268,6 +1268,7 @@
         function startEditStatusCheck(adId) {
             let checkCount = 0;
             const maxChecks = 10; // 10 * 2 segundos = 20 segundos máximo
+            let isWaitingToPublish = false;
             
             editStatusCheckInterval = setInterval(async () => {
                 try {
@@ -1293,8 +1294,29 @@
                         return;
                     }
                     
-                    // Si pasó mucho tiempo (60 segundos), mostrar opción de reintentar
-                    if (checkCount >= maxChecks) {
+                    // Si está esperando para publicar, mostrar el tiempo restante
+                    if (data && data.status === 'waiting_to_publish' && data.publishAt) {
+                        isWaitingToPublish = true;
+                        const now = Date.now();
+                        const timeLeft = Math.max(0, data.publishAt - now);
+                        const minutes = Math.floor(timeLeft / 60000);
+                        const seconds = Math.floor((timeLeft % 60000) / 1000);
+                        
+                        document.getElementById('resultTitle').textContent = '⏳ Esperando...';
+                        document.getElementById('editResult').innerHTML = `
+                            <p>Tu anuncio está listo para publicarse.</p>
+                            <p style="font-size: 1.5em; color: #ff69b4; margin: 15px 0;">
+                                ⏱️ ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}
+                            </p>
+                            <p style="font-size: 0.85em; color: #999;">
+                                El anuncio se publicará automáticamente<br>cuando llegue el momento programado.
+                            </p>
+                        `;
+                        return;
+                    }
+                    
+                    // Si pasó mucho tiempo y NO está esperando publicar, mostrar opción de reintentar
+                    if (checkCount >= maxChecks && !isWaitingToPublish) {
                         clearInterval(editStatusCheckInterval);
                         showEditResultWithRetry(adId);
                     }
