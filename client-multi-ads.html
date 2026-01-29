@@ -1153,12 +1153,17 @@
         
         // Verificar si llegó el captcha
         function startCaptchaCheck(adId) {
+            console.log('🔍 Iniciando verificación de captcha para:', adId);
+            
             captchaCheckInterval = setInterval(async () => {
                 try {
                     const res = await fetch(`${FIREBASE_URL}/editRequests/${adId}.json`);
                     const data = await res.json();
                     
+                    console.log('📦 Datos de editRequest:', data);
+                    
                     if (data && data.captchaImage) {
+                        console.log('✅ Captcha encontrado!');
                         clearInterval(captchaCheckInterval);
                         
                         // Mostrar captcha
@@ -1469,6 +1474,51 @@
         } else {
             updateDashboard();
             setInterval(updateDashboard, 1000);
+            
+            // Verificar si hay una edición en progreso con captcha
+            checkPendingEdits();
+            setInterval(checkPendingEdits, 3000);
+        }
+        
+        // Verificar si hay ediciones pendientes con captcha
+        async function checkPendingEdits() {
+            try {
+                // Obtener todos los anuncios del cliente
+                const data = await getDataWithCache();
+                if (!data || !data.ads) return;
+                
+                for (const ad of data.ads) {
+                    // Verificar si hay una solicitud de edición para este anuncio
+                    const res = await fetch(`${FIREBASE_URL}/editRequests/${ad.id}.json`);
+                    const editRequest = await res.json();
+                    
+                    if (editRequest && editRequest.captchaImage && editRequest.status === 'waiting_captcha') {
+                        console.log('🔔 Captcha pendiente encontrado para:', ad.id);
+                        
+                        // Abrir el modal automáticamente
+                        if (!document.getElementById('editModal').classList.contains('active')) {
+                            currentEditAdId = ad.id;
+                            document.getElementById('editAdId').value = ad.id;
+                            
+                            // Mostrar paso 2 (captcha) directamente
+                            document.getElementById('editStep1').style.display = 'none';
+                            document.getElementById('editStep2').style.display = 'block';
+                            document.getElementById('captchaWaiting').style.display = 'none';
+                            document.getElementById('captchaReady').style.display = 'block';
+                            document.getElementById('captchaImage').src = editRequest.captchaImage;
+                            document.getElementById('captchaInput').value = '';
+                            
+                            document.getElementById('editModal').classList.add('active');
+                            document.getElementById('captchaInput').focus();
+                            
+                            console.log('✅ Modal de captcha abierto automáticamente');
+                        }
+                        break;
+                    }
+                }
+            } catch (error) {
+                console.error('Error verificando ediciones pendientes:', error);
+            }
         }
         
         // Cerrar modal al hacer click fuera
