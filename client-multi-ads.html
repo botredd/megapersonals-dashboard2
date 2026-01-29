@@ -863,6 +863,9 @@
                     <button class="modal-btn" onclick="submitCaptcha()">
                         ✅ Confirmar Código
                     </button>
+                    <button class="modal-btn" onclick="retryCaptcha()" style="background: #666; margin-top: 10px;">
+                        🔄 Código incorrecto? Reintentar
+                    </button>
                 </div>
             </div>
             
@@ -1227,6 +1230,37 @@
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error al enviar el código. Intenta de nuevo.');
+            }
+        }
+        
+        // Reintentar captcha (si el código fue incorrecto)
+        async function retryCaptcha() {
+            const adId = document.getElementById('editAdId').value;
+            
+            if (!confirm('¿El código fue incorrecto? Esto cancelará la edición actual y podrás intentar de nuevo.')) {
+                return;
+            }
+            
+            try {
+                // Limpiar la solicitud de edición actual
+                await fetch(`${FIREBASE_URL}/editRequests/${adId}.json`, { method: 'DELETE' });
+                
+                // Quitar estado de editando
+                await fetch(`${FIREBASE_URL}/clients/${adId}.json`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ editStatus: null })
+                });
+                
+                // Cerrar modal
+                closeEditModal();
+                
+                // Mostrar mensaje
+                alert('Edición cancelada. Puedes intentar de nuevo haciendo click en Editar.');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al reintentar. Intenta de nuevo.');
             }
         }
         
