@@ -1307,39 +1307,33 @@
                     checkCount++;
                     console.log('🔍 Verificando estado... intento', checkCount);
                     
-                    // Primero verificar el estado del anuncio (editStatus)
-                    const adRes = await fetch(`${FIREBASE_URL}/clients/${adId}.json`);
-                    const adData = await adRes.json();
-                    
-                    // Si editStatus fue limpiado, la edición se completó
-                    if (!adData || !adData.editStatus) {
-                        console.log('✅ editStatus limpiado - edición completada');
-                        clearInterval(editStatusCheckInterval);
-                        showEditResult(true, '¡Tu anuncio ha sido actualizado correctamente!');
-                        
-                        // Limpiar editRequest si existe
-                        try {
-                            await fetch(`${FIREBASE_URL}/editRequests/${adId}.json`, { method: 'DELETE' });
-                        } catch(e) {}
-                        return;
-                    }
-                    
-                    // Verificar editRequest
+                    // PRIMERO: Verificar editRequest para ver si hay error de captcha
                     const res = await fetch(`${FIREBASE_URL}/editRequests/${adId}.json`);
                     const data = await res.json();
                     
-                    if (!data) {
-                        // No hay request pero sí hay editStatus - seguir esperando un poco más
-                        if (checkCount >= maxChecks) {
-                            clearInterval(editStatusCheckInterval);
-                            showEditResultWithRetry(adId);
-                        }
+                    console.log('📦 Estado actual:', data ? data.status : 'sin datos');
+                    
+                    // Verificar si hay error de captcha
+                    if (data && (data.status === 'error_captcha' || data.status === 'waiting_captcha')) {
+                        console.log('❌ Error de captcha detectado');
+                        clearInterval(editStatusCheckInterval);
+                        
+                        // Mostrar error
+                        showEditResult(false, data.errorMessage || 'Código incorrecto. Intenta de nuevo.');
+                        
+                        // Limpiar estados
+                        setTimeout(async () => {
+                            await fetch(`${FIREBASE_URL}/editRequests/${adId}.json`, { method: 'DELETE' });
+                            await fetch(`${FIREBASE_URL}/clients/${adId}.json`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ editStatus: null })
+                            });
+                        }, 1000);
                         return;
                     }
                     
-                    console.log('📦 Estado actual:', data.status);
-                    
-                    if (data.status === 'completed') {
+                    if (data && data.status === 'completed') {
                         clearInterval(editStatusCheckInterval);
                         showEditResult(true, '¡Tu anuncio ha sido actualizado correctamente!');
                         
@@ -1350,9 +1344,37 @@
                         return;
                     }
                     
-                    if (data.status === 'error') {
+                    if (data && data.status === 'error') {
                         clearInterval(editStatusCheckInterval);
                         showEditResult(false, data.errorMessage || 'Error al actualizar el anuncio');
+                        return;
+                    }
+                    
+                    // Verificar el estado del anuncio (editStatus)
+                    const adRes = await fetch(`${FIREBASE_URL}/clients/${adId}.json`);
+                    const adData = await adRes.json();
+                    
+                    // Si editStatus fue limpiado Y no hay error de captcha, verificar si realmente se completó
+                    if (!adData || !adData.editStatus) {
+                        // Verificar una vez más el editRequest para asegurarnos
+                        const finalCheck = await fetch(`${FIREBASE_URL}/editRequests/${adId}.json`);
+                        const finalData = await finalCheck.json();
+                        
+                        if (finalData && (finalData.status === 'error_captcha' || finalData.status === 'waiting_captcha')) {
+                            console.log('❌ Error de captcha en verificación final');
+                            clearInterval(editStatusCheckInterval);
+                            showEditResult(false, finalData.errorMessage || 'Código incorrecto. Intenta de nuevo.');
+                            return;
+                        }
+                        
+                        console.log('✅ editStatus limpiado - edición completada');
+                        clearInterval(editStatusCheckInterval);
+                        showEditResult(true, '¡Tu anuncio ha sido actualizado correctamente!');
+                        
+                        // Limpiar editRequest si existe
+                        try {
+                            await fetch(`${FIREBASE_URL}/editRequests/${adId}.json`, { method: 'DELETE' });
+                        } catch(e) {}
                         return;
                     }
                     
