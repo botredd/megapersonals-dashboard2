@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - BotRedd</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Panel de Administración - MegaPersonals Bot</title>
     <style>
         * {
             margin: 0;
@@ -13,176 +12,120 @@
         }
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a0a2e 0%, #2d1f3d 50%, #1a0a2e 100%);
             min-height: 100vh;
-            color: #fff;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 280px;
-            height: 100vh;
-            background: rgba(20, 20, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 105, 180, 0.2);
             padding: 20px;
-            z-index: 100;
-            overflow-y: auto;
+            color: white;
         }
         
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 15px;
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
             margin-bottom: 30px;
-        }
-        
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-        
-        .logo-text {
-            font-size: 1.5em;
-            font-weight: 700;
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            font-size: 2.5em;
+            background: linear-gradient(90deg, #ff69b4, #9333ea);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: none;
         }
         
-        .nav-section {
-            margin-bottom: 25px;
-        }
-        
-        .nav-title {
-            font-size: 0.75em;
-            text-transform: uppercase;
-            color: #888;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            padding-left: 15px;
-        }
-        
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 15px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #aaa;
-            text-decoration: none;
-        }
-        
-        .nav-item:hover, .nav-item.active {
-            background: rgba(255, 105, 180, 0.15);
-            color: #ff69b4;
-        }
-        
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 105, 180, 0.2), rgba(255, 20, 147, 0.2));
-            border: 1px solid rgba(255, 105, 180, 0.3);
-        }
-        
-        .nav-icon {
-            font-size: 1.2em;
-        }
-        
-        /* Main Content */
-        .main-content {
-            margin-left: 280px;
-            padding: 30px;
-            min-height: 100vh;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Tarjetas de resumen financiero */
+        .finance-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
             margin-bottom: 30px;
         }
         
-        .header h1 {
+        .finance-card {
+            background: linear-gradient(145deg, rgba(45,31,61,0.9), rgba(26,10,31,0.9));
+            border: 1px solid rgba(255,105,180,0.3);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .finance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+        
+        .finance-card.income::before {
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+        }
+        
+        .finance-card.expense::before {
+            background: linear-gradient(90deg, #ff6b6b, #ee5a52);
+        }
+        
+        .finance-card.balance::before {
+            background: linear-gradient(90deg, #ff69b4, #9333ea);
+        }
+        
+        .finance-card.accounts::before {
+            background: linear-gradient(90deg, #00d4ff, #0099cc);
+        }
+        
+        .finance-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .finance-label {
+            color: #999;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+        
+        .finance-value {
             font-size: 1.8em;
-            font-weight: 600;
-        }
-        
-        .header-stats {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .stat-mini {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .stat-mini-value {
-            font-size: 1.3em;
             font-weight: 700;
+        }
+        
+        .finance-value.positive {
+            color: #00ff88;
+        }
+        
+        .finance-value.negative {
+            color: #ff6b6b;
+        }
+        
+        .finance-value.neutral {
             color: #ff69b4;
         }
         
-        .stat-mini-label {
-            font-size: 0.75em;
-            color: #888;
-        }
-        
-        /* Cards */
         .card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(145deg, rgba(45,31,61,0.9), rgba(26,10,31,0.9));
+            border: 1px solid rgba(255,105,180,0.2);
             border-radius: 20px;
             padding: 25px;
-            margin-bottom: 25px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 20px;
+            color: white;
         }
         
-        .card-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .card h2 {
+            color: #ff69b4;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,105,180,0.3);
         }
         
-        .card-title-icon {
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* Form Styles */
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
         }
         
         .form-group {
@@ -190,264 +133,133 @@
             flex-direction: column;
         }
         
-        .form-group label {
-            font-size: 0.85em;
-            color: #aaa;
-            margin-bottom: 8px;
+        label {
+            font-size: 0.9em;
+            color: #ccc;
+            margin-bottom: 5px;
             font-weight: 500;
         }
         
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            font-size: 0.95em;
-            font-family: 'Poppins', sans-serif;
+        input, select, textarea {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,105,180,0.3);
+            font-size: 14px;
             transition: all 0.3s;
+            background: rgba(0,0,0,0.3);
+            color: white;
         }
         
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: #ff69b4;
-            background: rgba(255, 105, 180, 0.1);
+            box-shadow: 0 0 10px rgba(255,105,180,0.3);
         }
         
-        .form-group input::placeholder {
+        input::placeholder {
             color: #666;
         }
         
-        .form-group select option {
-            background: #1a1a2e;
-            color: #fff;
-        }
-        
-        /* Buttons */
-        .btn {
-            padding: 12px 24px;
-            border-radius: 12px;
+        button {
+            padding: 12px 25px;
+            border-radius: 10px;
             border: none;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9em;
-            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+            font-size: 14px;
             transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            background: linear-gradient(135deg, #ff69b4, #9333ea);
             color: white;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #ff4757, #ff3344);
-            color: white;
+            box-shadow: 0 4px 20px rgba(255,105,180,0.4);
         }
         
         .btn-success {
-            background: linear-gradient(135deg, #00d4aa, #00b894);
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #003d20;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
             color: white;
         }
         
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.8em;
+        .btn-warning {
+            background: linear-gradient(135deg, #ffa500, #ff8c00);
+            color: #4d3200;
         }
         
-        /* Table */
+        .btn-info {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+        
+        /* Tablas */
         .table-container {
             overflow-x: auto;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 15px;
         }
         
         th {
-            background: rgba(255, 105, 180, 0.1);
-            padding: 15px;
+            background: rgba(255,105,180,0.1);
+            padding: 12px;
             text-align: left;
             font-weight: 600;
-            font-size: 0.85em;
             color: #ff69b4;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,105,180,0.3);
         }
         
         td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.9em;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         
         tr:hover {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255,105,180,0.05);
         }
         
-        /* Status Badges */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 500;
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
         }
         
-        .badge-active {
-            background: rgba(0, 212, 170, 0.15);
-            color: #00d4aa;
-            border: 1px solid rgba(0, 212, 170, 0.3);
+        .status-active {
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
         }
         
-        .badge-inactive {
-            background: rgba(255, 71, 87, 0.15);
-            color: #ff4757;
-            border: 1px solid rgba(255, 71, 87, 0.3);
+        .status-blocked {
+            background: rgba(255,107,107,0.2);
+            color: #ff6b6b;
         }
         
-        .badge-expired {
-            background: rgba(150, 150, 150, 0.15);
+        .status-available {
+            background: rgba(0,212,255,0.2);
+            color: #00d4ff;
+        }
+        
+        .status-expired {
+            background: rgba(150,150,150,0.2);
             color: #999;
-            border: 1px solid rgba(150, 150, 150, 0.3);
-        }
-        
-        .badge-count {
-            background: rgba(255, 105, 180, 0.15);
-            color: #ff69b4;
-            border: 1px solid rgba(255, 105, 180, 0.3);
-        }
-        
-        /* Link Display */
-        .link-display {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 105, 180, 0.1);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 105, 180, 0.2);
-        }
-        
-        .link-input {
-            flex: 1;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85em;
-            color: #fff;
-        }
-        
-        /* Success/Error Messages */
-        .message {
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-top: 15px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .message-success {
-            background: rgba(0, 212, 170, 0.15);
-            border: 1px solid rgba(0, 212, 170, 0.3);
-            color: #00d4aa;
-        }
-        
-        .message-error {
-            background: rgba(255, 71, 87, 0.15);
-            border: 1px solid rgba(255, 71, 87, 0.3);
-            color: #ff4757;
-        }
-        
-        /* Alert/Info Box */
-        .alert {
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-        }
-        
-        .alert-info {
-            background: rgba(0, 200, 255, 0.1);
-            border: 1px solid rgba(0, 200, 255, 0.2);
-        }
-        
-        .alert-icon {
-            font-size: 1.5em;
-        }
-        
-        .alert-content h4 {
-            color: #00c8ff;
-            margin-bottom: 5px;
-        }
-        
-        .alert-content p {
-            color: #aaa;
-            font-size: 0.9em;
-            line-height: 1.6;
-        }
-        
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 2.5em;
-            font-weight: 700;
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .stat-label {
-            color: #888;
-            font-size: 0.85em;
-            margin-top: 5px;
         }
         
         /* Tabs */
@@ -455,62 +267,35 @@
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 15px;
-        }
-        
-        .tab {
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #888;
-            font-weight: 500;
-        }
-        
-        .tab:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .tab.active {
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            color: white;
-        }
-        
-        /* Action Buttons in Table */
-        .action-buttons {
-            display: flex;
-            gap: 8px;
             flex-wrap: wrap;
         }
         
-        /* Client Info in Table */
-        .client-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .client-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
+        .tab-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,105,180,0.3);
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         
-        .client-details h4 {
-            font-weight: 500;
-            margin-bottom: 2px;
+        .tab-btn:hover {
+            background: rgba(255,105,180,0.2);
         }
         
-        .client-details span {
-            font-size: 0.8em;
-            color: #888;
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ff69b4, #9333ea);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
         }
         
         /* Modal */
@@ -521,10 +306,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0,0,0,0.8);
             z-index: 1000;
-            align-items: center;
             justify-content: center;
+            align-items: center;
         }
         
         .modal.active {
@@ -532,8 +317,8 @@
         }
         
         .modal-content {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 1px solid rgba(255, 105, 180, 0.2);
+            background: linear-gradient(145deg, #2d1f3d, #1a0a2e);
+            border: 1px solid rgba(255,105,180,0.3);
             border-radius: 20px;
             padding: 30px;
             max-width: 500px;
@@ -549,761 +334,1009 @@
             margin-bottom: 20px;
         }
         
+        .modal-header h3 {
+            color: #ff69b4;
+        }
+        
         .modal-close {
             background: none;
             border: none;
-            color: #888;
+            color: #999;
             font-size: 1.5em;
             cursor: pointer;
         }
         
-        .modal-close:hover {
-            color: #ff4757;
+        .link-display {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
         }
         
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .link-input {
+            flex: 1;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,105,180,0.3);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff88;
         }
         
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
+        .success-message {
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
         }
         
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 105, 180, 0.3);
-            border-radius: 4px;
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
         }
         
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 105, 180, 0.5);
+        .alert-info {
+            background: rgba(0,212,255,0.1);
+            border-color: #00d4ff;
         }
         
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 80px;
-                padding: 15px 10px;
-            }
-            
-            .logo-text, .nav-text, .nav-title {
-                display: none;
-            }
-            
-            .nav-item {
-                justify-content: center;
-                padding: 15px;
-            }
-            
-            .main-content {
-                margin-left: 80px;
-            }
+        /* Historial de pagos */
+        .payment-history {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .payment-item .date {
+            color: #999;
+        }
+        
+        .payment-item .amount {
+            color: #00ff88;
+            font-weight: 600;
         }
         
         @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 15px;
-            }
-            
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
             .form-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .finance-summary {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .tabs {
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="logo">
-            <div class="logo-icon">🤖</div>
-            <span class="logo-text">BotRedd</span>
+    <div class="container">
+        <h1>🔧 Panel de Administración</h1>
+        
+        <!-- Resumen Financiero -->
+        <div class="finance-summary">
+            <div class="finance-card income">
+                <div class="finance-icon">💰</div>
+                <div class="finance-label">Total Cobrado</div>
+                <div class="finance-value positive" id="totalIncome">$0</div>
+            </div>
+            <div class="finance-card expense">
+                <div class="finance-icon">💸</div>
+                <div class="finance-label">Total Gastado</div>
+                <div class="finance-value negative" id="totalExpense">$0</div>
+            </div>
+            <div class="finance-card balance">
+                <div class="finance-icon">📊</div>
+                <div class="finance-label">Balance</div>
+                <div class="finance-value neutral" id="totalBalance">$0</div>
+            </div>
+            <div class="finance-card accounts">
+                <div class="finance-icon">📱</div>
+                <div class="finance-label">Cuentas MP</div>
+                <div class="finance-value" id="accountsCount" style="color: #00d4ff;">0</div>
+            </div>
         </div>
         
-        <nav>
-            <div class="nav-section">
-                <div class="nav-title">Principal</div>
-                <a href="#" class="nav-item active" onclick="showSection('dashboard')">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-text">Dashboard</span>
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('clients')">
-                    <span class="nav-icon">👥</span>
-                    <span class="nav-text">Clientes</span>
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('ads')">
-                    <span class="nav-icon">📢</span>
-                    <span class="nav-text">Anuncios</span>
-                </a>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-title">Crear</div>
-                <a href="#" class="nav-item" onclick="showSection('new-client')">
-                    <span class="nav-icon">➕</span>
-                    <span class="nav-text">Nuevo Cliente</span>
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('new-ad')">
-                    <span class="nav-icon">📝</span>
-                    <span class="nav-text">Nuevo Anuncio</span>
-                </a>
-            </div>
-        </nav>
-    </aside>
-    
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Dashboard Section -->
-        <section id="section-dashboard">
-            <div class="header">
-                <h1>📊 Dashboard</h1>
-                <div class="header-stats">
-                    <div class="stat-mini">
-                        <div class="stat-mini-value" id="headerTotalClients">0</div>
-                        <div class="stat-mini-label">Clientes</div>
-                    </div>
-                    <div class="stat-mini">
-                        <div class="stat-mini-value" id="headerTotalAds">0</div>
-                        <div class="stat-mini-label">Anuncios</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="totalClients">0</div>
-                    <div class="stat-label">Total Clientes</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="totalAds">0</div>
-                    <div class="stat-label">Total Anuncios</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="activeAds">0</div>
-                    <div class="stat-label">Anuncios Activos</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="expiredAds">0</div>
-                    <div class="stat-label">Expirados</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <div class="card-title-icon">📢</div>
-                        Anuncios Recientes
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Anuncio</th>
-                                <th>Cliente</th>
-                                <th>Estado</th>
-                                <th>Próximo Bump</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentAdsTable">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('clients')">👥 Clientes (<span id="clientCount">0</span>)</button>
+            <button class="tab-btn" onclick="showTab('accounts')">📱 Cuentas MegaPersonals</button>
+            <button class="tab-btn" onclick="showTab('finances')">💵 Movimientos</button>
+        </div>
         
-        <!-- Clients Section -->
-        <section id="section-clients" style="display: none;">
-            <div class="header">
-                <h1>👥 Clientes</h1>
-                <button class="btn btn-primary" onclick="showSection('new-client')">
-                    ➕ Nuevo Cliente
-                </button>
-            </div>
-            
+        <!-- Tab: Clientes -->
+        <div id="tab-clients" class="tab-content active">
             <div class="card">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Teléfono</th>
-                                <th>Anuncios</th>
-                                <th>Creado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="clientsTable">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Ads Section -->
-        <section id="section-ads" style="display: none;">
-            <div class="header">
-                <h1>📢 Todos los Anuncios</h1>
-                <button class="btn btn-primary" onclick="showSection('new-ad')">
-                    ➕ Nuevo Anuncio
-                </button>
-            </div>
-            
-            <div class="card">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Anuncio</th>
-                                <th>Cliente</th>
-                                <th>Ciudad</th>
-                                <th>Estado</th>
-                                <th>Tiempo Restante</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="allAdsTable">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-        
-        <!-- New Client Section -->
-        <section id="section-new-client" style="display: none;">
-            <div class="header">
-                <h1>➕ Nuevo Cliente</h1>
-            </div>
-            
-            <div class="alert alert-info">
-                <span class="alert-icon">💡</span>
-                <div class="alert-content">
-                    <h4>Crear un Cliente</h4>
-                    <p>Crea un cliente primero, luego podrás asignarle anuncios. El cliente recibirá un link único para ver todos sus anuncios.</p>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <div class="card-title-icon">👤</div>
-                        Información del Cliente
-                    </div>
-                </div>
-                
-                <form id="newClientForm">
+                <h2>➕ Agregar Nuevo Cliente</h2>
+                <form id="addClientForm">
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Nombre del Cliente *</label>
-                            <input type="text" id="clientName" placeholder="Ej: María García" required>
+                            <input type="text" id="clientName" placeholder="Ej: Juan Pérez" required>
                         </div>
                         <div class="form-group">
-                            <label>Teléfono (opcional)</label>
-                            <input type="text" id="clientPhone" placeholder="Ej: +1 234 567 8900">
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>Notas (opcional)</label>
-                            <textarea id="clientNotes" rows="3" placeholder="Información adicional sobre el cliente..."></textarea>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        ✅ Crear Cliente
-                    </button>
-                </form>
-                
-                <div id="clientSuccessMessage" class="message message-success">
-                    ✅ Cliente creado exitosamente!
-                </div>
-                
-                <div id="clientLinkDisplay" class="link-display" style="display: none;">
-                    <input type="text" id="generatedClientLink" class="link-input" readonly>
-                    <button onclick="copyClientLink()" class="btn btn-secondary btn-sm">📋 Copiar</button>
-                    <button onclick="openClientLink()" class="btn btn-primary btn-sm">🔗 Abrir</button>
-                </div>
-            </div>
-        </section>
-        
-        <!-- New Ad Section -->
-        <section id="section-new-ad" style="display: none;">
-            <div class="header">
-                <h1>📝 Nuevo Anuncio</h1>
-            </div>
-            
-            <div class="alert alert-info">
-                <span class="alert-icon">💡</span>
-                <div class="alert-content">
-                    <h4>Crear un Anuncio</h4>
-                    <p>Solo necesitas asignar el anuncio a un cliente. El teléfono, ciudad y duración se configuran automáticamente desde el bot.</p>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <div class="card-title-icon">📢</div>
-                        Información del Anuncio
-                    </div>
-                </div>
-                
-                <form id="newAdForm">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Asignar a Cliente *</label>
-                            <select id="adClientSelect" required>
-                                <option value="">Seleccionar cliente...</option>
+                            <label>Cuenta MegaPersonals *</label>
+                            <select id="mpAccount" required>
+                                <option value="">Seleccionar cuenta...</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Nombre/Identificador (opcional)</label>
-                            <input type="text" id="adName" placeholder="Ej: Anuncio 1, Principal, etc.">
+                            <label>Duración (días)</label>
+                            <input type="number" id="duration" value="7" min="1" max="365">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha/Hora Inicio</label>
+                            <input type="datetime-local" id="startTime">
+                        </div>
+                        <div class="form-group">
+                            <label>💵 Pago del Cliente ($)</label>
+                            <input type="number" id="clientPayment" placeholder="100" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="text" id="clientPhone" placeholder="Ej: 123-456-7890">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">
-                        ✅ Crear Anuncio
-                    </button>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Notas</label>
+                        <textarea id="notes" rows="2" placeholder="Notas adicionales..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">➕ Agregar Cliente</button>
                 </form>
                 
-                <div id="adSuccessMessage" class="message message-success">
-                    ✅ Anuncio creado exitosamente!
+                <div id="linkDisplay" class="link-display" style="display: none;">
+                    <input type="text" id="generatedLink" class="link-input" readonly>
+                    <button onclick="copyLink()" class="btn-info btn-small">📋 Copiar</button>
+                    <button onclick="openLink()" class="btn-success btn-small">🔗 Abrir</button>
                 </div>
-                
-                <div id="adIdDisplay" class="link-display" style="display: none;">
-                    <span style="color: #aaa;">ID del Anuncio (usar en la extensión):</span>
-                    <input type="text" id="generatedAdId" class="link-input" readonly>
-                    <button onclick="copyAdId()" class="btn btn-secondary btn-sm">📋 Copiar ID</button>
+                <div id="successMessage" class="success-message">✅ Cliente agregado exitosamente!</div>
+            </div>
+            
+            <div class="card">
+                <h2>👥 Lista de Clientes</h2>
+                <input type="text" id="searchInput" placeholder="🔍 Buscar cliente..." onkeyup="filterClients()" style="width: 100%; margin-bottom: 15px;">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Cuenta MP</th>
+                                <th>Estado</th>
+                                <th>Pagos</th>
+                                <th>Restante</th>
+                                <th>Finaliza</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsTableBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 30px; color: #999;">
+                                    No hay clientes registrados
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </section>
-    </main>
-    
-    <!-- Delete Confirmation Modal -->
-    <div class="modal" id="deleteModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>⚠️ Confirmar Eliminación</h3>
-                <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+        </div>
+        
+        <!-- Tab: Cuentas MegaPersonals -->
+        <div id="tab-accounts" class="tab-content">
+            <div class="card">
+                <h2>➕ Agregar Cuenta MegaPersonals</h2>
+                <form id="addAccountForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nombre/Identificador *</label>
+                            <input type="text" id="accountName" placeholder="Ej: MP-001, Cuenta Principal" required>
+                        </div>
+                        <div class="form-group">
+                            <label>💸 Costo de la Cuenta ($) *</label>
+                            <input type="number" id="accountCost" placeholder="280" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>📧 Email/Usuario *</label>
+                            <input type="text" id="accountEmail" placeholder="email@ejemplo.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>🔑 Contraseña *</label>
+                            <input type="text" id="accountPassword" placeholder="contraseña123" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de Compra</label>
+                            <input type="date" id="accountDate">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Notas</label>
+                        <textarea id="accountNotes" rows="2" placeholder="Notas sobre la cuenta..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">➕ Agregar Cuenta</button>
+                </form>
             </div>
-            <p style="color: #aaa; margin-bottom: 20px;">¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.</p>
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancelar</button>
-                <button class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+            
+            <div class="card">
+                <h2>📱 Cuentas MegaPersonals Activas</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cuenta</th>
+                                <th>Credenciales</th>
+                                <th>Costo</th>
+                                <th>Estado</th>
+                                <th>Cliente Actual</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountsTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                                    No hay cuentas registradas
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card" style="border-color: rgba(255,107,107,0.3);">
+                <h2 style="color: #ff6b6b;">🚫 Cuentas Bloqueadas</h2>
+                <p style="color: #999; margin-bottom: 15px; font-size: 0.9em;">Cuentas que fueron bloqueadas y representan pérdidas</p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cuenta</th>
+                                <th>📧 Email</th>
+                                <th>🔑 Contraseña</th>
+                                <th>💸 Costo (Pérdida)</th>
+                                <th>Fecha Bloqueo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="blockedAccountsTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                                    No hay cuentas bloqueadas
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab: Movimientos Financieros -->
+        <div id="tab-finances" class="tab-content">
+            <div class="card">
+                <h2>💵 Historial de Movimientos</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th>Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movementsTableBody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 30px; color: #999;">
+                                    No hay movimientos registrados
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
     
+    <!-- Modal para Renovación -->
+    <div id="renewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔄 Renovar Cliente</h3>
+                <button class="modal-close" onclick="closeRenewModal()">&times;</button>
+            </div>
+            <form id="renewForm">
+                <input type="hidden" id="renewClientId">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Cliente</label>
+                    <input type="text" id="renewClientName" readonly style="background: rgba(0,0,0,0.5);">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Días adicionales</label>
+                    <input type="number" id="renewDays" value="7" min="1" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>💵 Monto de Renovación ($)</label>
+                    <input type="number" id="renewAmount" placeholder="100" min="0" step="0.01" required>
+                </div>
+                <button type="submit" class="btn-success" style="width: 100%;">✅ Confirmar Renovación</button>
+            </form>
+        </div>
+    </div>
+    
     <script>
+        const BUMP_INTERVAL = 15.25; // minutos
         const FIREBASE_URL = 'https://ezequielredd-default-rtdb.firebaseio.com';
-        const DASHBOARD_BASE_URL = 'https://botredd.github.io/megapersonals-dashboard2/client-multi-ads.html';
         
-        // Navigation
-        function showSection(sectionName) {
-            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById(`section-${sectionName}`).style.display = 'block';
-            event.target.closest('.nav-item')?.classList.add('active');
-            
-            // Refresh data when switching sections
-            if (sectionName === 'dashboard') loadDashboard();
-            if (sectionName === 'clients') loadClients();
-            if (sectionName === 'ads') loadAllAds();
-            if (sectionName === 'new-ad') loadClientSelect();
+        // Inicializar fecha actual
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('startTime').value = now.toISOString().slice(0, 16);
+        document.getElementById('accountDate').value = now.toISOString().slice(0, 10);
+        
+        // ==================== TABS ====================
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.classList.add('active');
         }
         
-        // Modal
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
+        // ==================== CUENTAS MEGAPERSONALS ====================
+        function getAccounts() {
+            return JSON.parse(localStorage.getItem('mp_accounts') || '{}');
         }
         
-        // Load Dashboard
-        async function loadDashboard() {
-            try {
-                const [clientsRes, adsRes] = await Promise.all([
-                    fetch(`${FIREBASE_URL}/clientsInfo.json`),
-                    fetch(`${FIREBASE_URL}/clients.json`)
-                ]);
-                
-                const clients = await clientsRes.json() || {};
-                const ads = await adsRes.json() || {};
-                
-                const clientCount = Object.keys(clients).length;
-                const adsArray = Object.entries(ads).map(([id, ad]) => ({ id, ...ad }));
-                const adCount = adsArray.length;
-                const activeCount = adsArray.filter(ad => ad.active !== false && !isExpired(ad)).length;
-                const expiredCount = adsArray.filter(ad => isExpired(ad)).length;
-                
-                // Update stats
-                document.getElementById('totalClients').textContent = clientCount;
-                document.getElementById('headerTotalClients').textContent = clientCount;
-                document.getElementById('totalAds').textContent = adCount;
-                document.getElementById('headerTotalAds').textContent = adCount;
-                document.getElementById('activeAds').textContent = activeCount;
-                document.getElementById('expiredAds').textContent = expiredCount;
-                
-                // Recent ads table
-                const recentAds = adsArray.slice(-10).reverse();
-                document.getElementById('recentAdsTable').innerHTML = recentAds.map(ad => {
-                    const client = Object.values(clients).find(c => c.id === ad.clientId);
-                    const status = getAdStatus(ad);
-                    const nextBump = getNextBumpTime(ad);
-                    
-                    return `
-                        <tr>
-                            <td>
-                                <div class="client-info">
-                                    <div class="client-avatar">${(ad.name || ad.phone || '?')[0].toUpperCase()}</div>
-                                    <div class="client-details">
-                                        <h4>${ad.name || ad.phone || 'Sin nombre'}</h4>
-                                        <span>${ad.city || 'Sin ciudad'}</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>${client?.name || 'Sin asignar'}</td>
-                            <td><span class="badge ${status.class}">${status.text}</span></td>
-                            <td>${nextBump}</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-sm btn-secondary" onclick="copyAdId('${ad.id}')">📋 ID</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-                
-            } catch (error) {
-                console.error('Error loading dashboard:', error);
-            }
+        function saveAccounts(accounts) {
+            localStorage.setItem('mp_accounts', JSON.stringify(accounts));
         }
         
-        // Load Clients
-        async function loadClients() {
-            try {
-                const [clientsRes, adsRes] = await Promise.all([
-                    fetch(`${FIREBASE_URL}/clientsInfo.json`),
-                    fetch(`${FIREBASE_URL}/clients.json`)
-                ]);
-                
-                const clients = await clientsRes.json() || {};
-                const ads = await adsRes.json() || {};
-                
-                const clientsArray = Object.entries(clients).map(([id, client]) => {
-                    const clientAds = Object.values(ads).filter(ad => ad.clientId === client.id);
-                    return { id, ...client, adCount: clientAds.length };
-                });
-                
-                document.getElementById('clientsTable').innerHTML = clientsArray.map(client => `
-                    <tr>
-                        <td>
-                            <div class="client-info">
-                                <div class="client-avatar">${(client.name || '?')[0].toUpperCase()}</div>
-                                <div class="client-details">
-                                    <h4>${client.name || 'Sin nombre'}</h4>
-                                    <span>ID: ${client.id?.slice(-8) || 'N/A'}</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>${client.phone || '-'}</td>
-                        <td><span class="badge badge-count">${client.adCount} anuncios</span></td>
-                        <td>${formatDate(client.createdAt)}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-primary" onclick="copyLink('${client.id}')">📋 Link</button>
-                                <button class="btn btn-sm btn-secondary" onclick="openLink('${client.id}')">🔗 Abrir</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteClient('${client.id}')">🗑️</button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
-                
-            } catch (error) {
-                console.error('Error loading clients:', error);
-            }
+        function getBlockedAccounts() {
+            return JSON.parse(localStorage.getItem('mp_blocked_accounts') || '{}');
         }
         
-        // Load All Ads
-        async function loadAllAds() {
-            try {
-                const [clientsRes, adsRes] = await Promise.all([
-                    fetch(`${FIREBASE_URL}/clientsInfo.json`),
-                    fetch(`${FIREBASE_URL}/clients.json`)
-                ]);
-                
-                const clients = await clientsRes.json() || {};
-                const ads = await adsRes.json() || {};
-                
-                const adsArray = Object.entries(ads).map(([id, ad]) => ({ id, ...ad }));
-                
-                document.getElementById('allAdsTable').innerHTML = adsArray.map(ad => {
-                    const client = Object.values(clients).find(c => c.id === ad.clientId);
-                    const status = getAdStatus(ad);
-                    const remaining = getRemainingTime(ad);
-                    
-                    return `
-                        <tr>
-                            <td>
-                                <div class="client-info">
-                                    <div class="client-avatar">${(ad.phone || '?')[0]}</div>
-                                    <div class="client-details">
-                                        <h4>${ad.phone || 'Sin teléfono'}</h4>
-                                        <span>${ad.name || 'Sin nombre'}</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>${client?.name || 'Sin asignar'}</td>
-                            <td>${ad.city || '-'}</td>
-                            <td><span class="badge ${status.class}">${status.text}</span></td>
-                            <td>${remaining}</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-sm btn-secondary" onclick="copyToClipboard('${ad.id}')">📋 ID</button>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteAd('${ad.id}')">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-                
-            } catch (error) {
-                console.error('Error loading ads:', error);
-            }
+        function saveBlockedAccounts(accounts) {
+            localStorage.setItem('mp_blocked_accounts', JSON.stringify(accounts));
         }
         
-        // Load Client Select for New Ad
-        async function loadClientSelect() {
-            try {
-                const res = await fetch(`${FIREBASE_URL}/clientsInfo.json`);
-                const clients = await res.json() || {};
-                
-                const select = document.getElementById('adClientSelect');
-                select.innerHTML = '<option value="">Seleccionar cliente...</option>';
-                
-                Object.entries(clients).forEach(([id, client]) => {
-                    select.innerHTML += `<option value="${client.id}">${client.name} (${client.phone || 'Sin tel'})</option>`;
-                });
-                
-            } catch (error) {
-                console.error('Error loading clients for select:', error);
-            }
-        }
-        
-        // Create New Client
-        document.getElementById('newClientForm').addEventListener('submit', async (e) => {
+        document.getElementById('addAccountForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
-            const name = document.getElementById('clientName').value.trim();
-            const phone = document.getElementById('clientPhone').value.trim();
-            const notes = document.getElementById('clientNotes').value.trim();
+            const accountId = 'acc_' + Date.now();
+            const account = {
+                id: accountId,
+                name: document.getElementById('accountName').value.trim(),
+                cost: parseFloat(document.getElementById('accountCost').value) || 0,
+                email: document.getElementById('accountEmail').value.trim(),
+                password: document.getElementById('accountPassword').value.trim(),
+                purchaseDate: document.getElementById('accountDate').value,
+                notes: document.getElementById('accountNotes').value.trim(),
+                status: 'available', // available, in_use
+                currentClient: null,
+                createdAt: Date.now()
+            };
             
-            const clientId = 'person_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const accounts = getAccounts();
+            accounts[accountId] = account;
+            saveAccounts(accounts);
             
-            try {
-                await fetch(`${FIREBASE_URL}/clientsInfo/${clientId}.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: clientId,
-                        name,
-                        phone,
-                        notes,
-                        createdAt: Date.now()
-                    })
-                });
-                
-                const link = `${DASHBOARD_BASE_URL}?client=${clientId}`;
-                document.getElementById('generatedClientLink').value = link;
-                document.getElementById('clientLinkDisplay').style.display = 'flex';
-                document.getElementById('clientSuccessMessage').style.display = 'flex';
-                
-                // Reset form
-                e.target.reset();
-                
-                // Hide success after 5 seconds
-                setTimeout(() => {
-                    document.getElementById('clientSuccessMessage').style.display = 'none';
-                }, 5000);
-                
-            } catch (error) {
-                console.error('Error creating client:', error);
-                alert('Error al crear cliente');
-            }
+            // Registrar gasto
+            addMovement('expense', `Compra cuenta: ${account.name}`, account.cost);
+            
+            document.getElementById('addAccountForm').reset();
+            document.getElementById('accountDate').value = now.toISOString().slice(0, 10);
+            
+            updateAll();
+            alert('✅ Cuenta agregada exitosamente!');
         });
         
-        // Create New Ad
-        document.getElementById('newAdForm').addEventListener('submit', async (e) => {
+        function updateAccountsTable() {
+            const accounts = getAccounts();
+            const accountsArray = Object.values(accounts);
+            const tbody = document.getElementById('accountsTableBody');
+            
+            // Contar cuentas activas (no bloqueadas)
+            document.getElementById('accountsCount').textContent = accountsArray.length;
+            
+            // Actualizar select de cuentas
+            const select = document.getElementById('mpAccount');
+            select.innerHTML = '<option value="">Seleccionar cuenta...</option>';
+            accountsArray.filter(a => a.status === 'available').forEach(acc => {
+                select.innerHTML += `<option value="${acc.id}">${acc.name} ($${acc.cost})</option>`;
+            });
+            
+            if (accountsArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 30px; color: #999;">No hay cuentas activas</td></tr>`;
+            } else {
+                tbody.innerHTML = accountsArray.map(acc => {
+                    let statusClass, statusText;
+                    if (acc.status === 'available') {
+                        statusClass = 'status-available';
+                        statusText = '🔵 Disponible';
+                    } else {
+                        statusClass = 'status-active';
+                        statusText = '🟢 En Uso';
+                    }
+                    
+                    const clientName = acc.currentClient ? getClientName(acc.currentClient) : '-';
+                    
+                    return `
+                        <tr>
+                            <td><strong>${acc.name}</strong></td>
+                            <td>
+                                <small style="color:#999">📧 ${acc.email}</small><br>
+                                <small style="color:#666">🔑 ${acc.password}</small>
+                            </td>
+                            <td>$${acc.cost.toFixed(2)}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>${clientName}</td>
+                            <td>
+                                <button onclick="markAccountBlocked('${acc.id}')" class="btn-danger btn-small" title="Marcar como bloqueada">🚫 Bloqueada</button>
+                                <button onclick="deleteAccount('${acc.id}')" class="btn-danger btn-small" title="Eliminar" style="margin-left:5px;">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            
+            // Actualizar tabla de cuentas bloqueadas
+            updateBlockedAccountsTable();
+        }
+        
+        function updateBlockedAccountsTable() {
+            const blockedAccounts = getBlockedAccounts();
+            const blockedArray = Object.values(blockedAccounts);
+            const tbody = document.getElementById('blockedAccountsTableBody');
+            
+            // También obtener cuentas bloqueadas reportadas por la extensión desde Firebase
+            fetchBlockedFromFirebase().then(firebaseBlocked => {
+                const allBlocked = [...blockedArray, ...firebaseBlocked];
+                
+                if (allBlocked.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 30px; color: #999;">No hay cuentas bloqueadas</td></tr>`;
+                    return;
+                }
+                
+                tbody.innerHTML = allBlocked.map(acc => {
+                    const blockedDate = acc.blockedAt ? new Date(acc.blockedAt).toLocaleDateString('es-ES') : '-';
+                    const cost = acc.cost || 0;
+                    const source = acc.reportedFrom === 'extension' ? '🤖 Auto' : '👤 Manual';
+                    
+                    return `
+                        <tr style="background: rgba(255,107,107,0.05);">
+                            <td>
+                                <strong style="color:#ff6b6b">${acc.name || 'Cuenta'}</strong>
+                                <br><small style="color:#666">${source}</small>
+                            </td>
+                            <td style="font-family: monospace; color: #ccc;">${acc.email || '-'}</td>
+                            <td style="font-family: monospace; color: #ccc;">${acc.password || '-'}</td>
+                            <td style="color:#ff6b6b; font-weight: bold;">-$${cost.toFixed(2)}</td>
+                            <td>${blockedDate}</td>
+                            <td>
+                                <button onclick="recoverAccount('${acc.id}')" class="btn-success btn-small" title="Recuperar cuenta">✅ Recuperar</button>
+                                <button onclick="deleteBlockedAccount('${acc.id}')" class="btn-danger btn-small" title="Eliminar registro" style="margin-left:5px;">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            });
+        }
+        
+        // Obtener cuentas bloqueadas desde Firebase (reportadas por la extensión)
+        async function fetchBlockedFromFirebase() {
+            try {
+                const response = await fetch(`${FIREBASE_URL}/blockedAccounts.json`);
+                const data = await response.json();
+                
+                if (!data) return [];
+                
+                return Object.entries(data).map(([id, acc]) => ({
+                    id: id,
+                    name: acc.email ? acc.email.split('@')[0] : 'Cuenta',
+                    email: acc.email,
+                    password: acc.password,
+                    cost: 0, // No sabemos el costo, se puede editar manualmente
+                    blockedAt: acc.blockedAt,
+                    reportedFrom: acc.reportedFrom || 'extension',
+                    clientId: acc.clientId
+                }));
+            } catch (error) {
+                console.error('Error fetching blocked accounts from Firebase:', error);
+                return [];
+            }
+        }
+        
+        function getClientName(clientId) {
+            const clients = getClients();
+            return clients[clientId]?.name || 'Desconocido';
+        }
+        
+        function markAccountBlocked(accountId) {
+            if (!confirm('⚠️ ¿Marcar esta cuenta como BLOQUEADA?\n\nEsto:\n• Moverá la cuenta a "Cuentas Bloqueadas"\n• Registrará la pérdida\n• Liberará al cliente si tiene uno asignado')) return;
+            
+            const accounts = getAccounts();
+            const account = accounts[accountId];
+            
+            if (account) {
+                // Liberar cliente si tiene uno
+                if (account.currentClient) {
+                    const clients = getClients();
+                    if (clients[account.currentClient]) {
+                        clients[account.currentClient].accountId = null;
+                        saveClients(clients);
+                    }
+                }
+                
+                // Mover a bloqueadas
+                const blockedAccounts = getBlockedAccounts();
+                account.blockedAt = Date.now();
+                account.status = 'blocked';
+                blockedAccounts[accountId] = account;
+                saveBlockedAccounts(blockedAccounts);
+                
+                // Eliminar de activas
+                delete accounts[accountId];
+                saveAccounts(accounts);
+                
+                // Registrar pérdida
+                addMovement('loss', `Cuenta bloqueada: ${account.name} (${account.email})`, account.cost);
+                
+                updateAll();
+                alert('🚫 Cuenta marcada como bloqueada y movida al historial');
+            }
+        }
+        
+        function recoverAccount(accountId) {
+            if (!confirm('✅ ¿Recuperar esta cuenta?\n\nEsto:\n• Moverá la cuenta de vuelta a activas\n• Revertirá la pérdida registrada')) return;
+            
+            const blockedAccounts = getBlockedAccounts();
+            const account = blockedAccounts[accountId];
+            
+            if (account) {
+                // Mover a activas
+                const accounts = getAccounts();
+                account.status = 'available';
+                account.currentClient = null;
+                delete account.blockedAt;
+                accounts[accountId] = account;
+                saveAccounts(accounts);
+                
+                // Eliminar de bloqueadas
+                delete blockedAccounts[accountId];
+                saveBlockedAccounts(blockedAccounts);
+                
+                // Revertir pérdida
+                addMovement('recovery', `Cuenta recuperada: ${account.name} (${account.email})`, account.cost);
+                
+                updateAll();
+                alert('✅ Cuenta recuperada y disponible nuevamente');
+            }
+        }
+        
+        function deleteAccount(accountId) {
+            if (!confirm('¿Eliminar esta cuenta permanentemente?\n\nNota: Si quieres registrar que fue bloqueada, usa el botón "🚫 Bloqueada" en su lugar.')) return;
+            
+            const accounts = getAccounts();
+            delete accounts[accountId];
+            saveAccounts(accounts);
+            updateAll();
+        }
+        
+        function deleteBlockedAccount(accountId) {
+            if (!confirm('¿Eliminar este registro de cuenta bloqueada?\n\nNota: Esto solo elimina el registro, no afecta las finanzas.')) return;
+            
+            const blockedAccounts = getBlockedAccounts();
+            delete blockedAccounts[accountId];
+            saveBlockedAccounts(blockedAccounts);
+            updateAll();
+        }
+        
+        // ==================== CLIENTES ====================
+        function getClients() {
+            return JSON.parse(localStorage.getItem('mp_clients') || '{}');
+        }
+        
+        function saveClients(clients) {
+            localStorage.setItem('mp_clients', JSON.stringify(clients));
+        }
+        
+        document.getElementById('addClientForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
-            const clientId = document.getElementById('adClientSelect').value;
-            const name = document.getElementById('adName').value.trim();
+            const accountId = document.getElementById('mpAccount').value;
+            if (!accountId) {
+                alert('⚠️ Selecciona una cuenta MegaPersonals');
+                return;
+            }
             
-            const adId = 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const clientId = 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const payment = parseFloat(document.getElementById('clientPayment').value) || 0;
+            const duration = parseInt(document.getElementById('duration').value);
+            const startTime = new Date(document.getElementById('startTime').value).getTime();
+            
+            const client = {
+                id: clientId,
+                name: document.getElementById('clientName').value.trim(),
+                phone: document.getElementById('clientPhone').value.trim(),
+                accountId: accountId,
+                duration: duration * 24 * 60, // minutos
+                startTime: startTime,
+                active: true,
+                lastBumpTime: startTime,
+                nextBumpTime: startTime + (BUMP_INTERVAL * 60 * 1000),
+                notes: document.getElementById('notes').value.trim(),
+                payments: [{
+                    date: Date.now(),
+                    amount: payment,
+                    type: 'initial',
+                    note: 'Pago inicial'
+                }],
+                totalPaid: payment,
+                createdAt: Date.now()
+            };
+            
+            // Actualizar cuenta MP
+            const accounts = getAccounts();
+            if (accounts[accountId]) {
+                accounts[accountId].status = 'in_use';
+                accounts[accountId].currentClient = clientId;
+                saveAccounts(accounts);
+            }
+            
+            // Guardar cliente
+            const clients = getClients();
+            clients[clientId] = client;
+            saveClients(clients);
+            
+            // Registrar ingreso
+            addMovement('income', `Pago inicial: ${client.name}`, payment);
+            
+            // Generar link
+            const baseUrl = window.location.href.replace('admin_panel.html', 'client-multi-ads.html');
+            const clientLink = `${baseUrl}?id=${clientId}`;
+            
+            document.getElementById('generatedLink').value = clientLink;
+            document.getElementById('linkDisplay').style.display = 'flex';
+            document.getElementById('successMessage').style.display = 'block';
+            
+            document.getElementById('addClientForm').reset();
+            document.getElementById('startTime').value = now.toISOString().slice(0, 16);
+            
+            updateAll();
+            
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+            }, 3000);
+        });
+        
+        function updateClientsTable() {
+            const clients = getClients();
+            const clientsArray = Object.values(clients);
+            const accounts = getAccounts();
+            const tbody = document.getElementById('clientsTableBody');
             const now = Date.now();
             
-            try {
-                await fetch(`${FIREBASE_URL}/clients/${adId}.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        clientId,
-                        name: name || 'Anuncio',
-                        active: false, // Inactivo hasta que el bot lo configure
-                        createdAt: now
-                    })
+            document.getElementById('clientCount').textContent = clientsArray.length;
+            
+            if (clientsArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: #999;">No hay clientes registrados</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = clientsArray.map(client => {
+                const endTime = client.startTime + (client.duration * 60 * 1000);
+                const isExpired = now >= endTime;
+                const isActive = client.active && !isExpired;
+                
+                let status, statusClass;
+                if (isExpired) {
+                    status = 'Expirado';
+                    statusClass = 'status-expired';
+                } else if (isActive) {
+                    status = 'Activo';
+                    statusClass = 'status-active';
+                } else {
+                    status = 'Pausado';
+                    statusClass = 'status-blocked';
+                }
+                
+                const remaining = Math.max(0, endTime - now);
+                const days = Math.floor(remaining / (24 * 60 * 60 * 1000));
+                const hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                const remainingStr = isExpired ? 'Expirado' : `${days}d ${hours}h`;
+                
+                const endDateStr = new Date(endTime).toLocaleDateString('es-ES', {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
                 
-                document.getElementById('generatedAdId').value = adId;
-                document.getElementById('adIdDisplay').style.display = 'flex';
-                document.getElementById('adSuccessMessage').style.display = 'flex';
+                const account = accounts[client.accountId];
+                const accountName = account ? account.name : 'Sin cuenta';
                 
-                // Reset form
-                e.target.reset();
+                return `
+                    <tr>
+                        <td>
+                            <strong>${client.name}</strong>
+                            ${client.phone ? `<br><small style="color:#999">${client.phone}</small>` : ''}
+                        </td>
+                        <td>${accountName}</td>
+                        <td><span class="status-badge ${statusClass}">${status}</span></td>
+                        <td>
+                            <strong style="color:#00ff88">$${client.totalPaid.toFixed(2)}</strong>
+                            <br><small style="color:#999">${client.payments.length} pago(s)</small>
+                        </td>
+                        <td>${remainingStr}</td>
+                        <td>${endDateStr}</td>
+                        <td>
+                            <button onclick="openRenewModal('${client.id}')" class="btn-success btn-small" title="Renovar">🔄</button>
+                            <button onclick="copyClientLink('${client.id}')" class="btn-info btn-small" title="Copiar link">📋</button>
+                            <button onclick="toggleClient('${client.id}')" class="btn-warning btn-small" title="${isActive ? 'Pausar' : 'Activar'}">
+                                ${isActive ? '⏸️' : '▶️'}
+                            </button>
+                            <button onclick="releaseAccount('${client.id}')" class="btn-primary btn-small" title="Liberar cuenta">🔓</button>
+                            <button onclick="deleteClient('${client.id}')" class="btn-danger btn-small" title="Eliminar">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function openRenewModal(clientId) {
+            const clients = getClients();
+            const client = clients[clientId];
+            if (!client) return;
+            
+            document.getElementById('renewClientId').value = clientId;
+            document.getElementById('renewClientName').value = client.name;
+            document.getElementById('renewDays').value = 7;
+            document.getElementById('renewAmount').value = '';
+            document.getElementById('renewModal').classList.add('active');
+        }
+        
+        function closeRenewModal() {
+            document.getElementById('renewModal').classList.remove('active');
+        }
+        
+        document.getElementById('renewForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const clientId = document.getElementById('renewClientId').value;
+            const days = parseInt(document.getElementById('renewDays').value);
+            const amount = parseFloat(document.getElementById('renewAmount').value) || 0;
+            
+            const clients = getClients();
+            if (clients[clientId]) {
+                // Agregar tiempo
+                clients[clientId].duration += days * 24 * 60;
                 
-                setTimeout(() => {
-                    document.getElementById('adSuccessMessage').style.display = 'none';
-                }, 5000);
+                // Registrar pago
+                clients[clientId].payments.push({
+                    date: Date.now(),
+                    amount: amount,
+                    type: 'renewal',
+                    note: `Renovación ${days} días`
+                });
+                clients[clientId].totalPaid += amount;
                 
-            } catch (error) {
-                console.error('Error creating ad:', error);
-                alert('Error al crear anuncio');
+                saveClients(clients);
+                
+                // Registrar ingreso
+                addMovement('income', `Renovación: ${clients[clientId].name} (+${days} días)`, amount);
+                
+                closeRenewModal();
+                updateAll();
+                alert('✅ Cliente renovado exitosamente!');
             }
         });
         
-        // Helper Functions
-        function isExpired(ad) {
-            if (!ad.startTime || !ad.duration) return false;
-            return Date.now() > ad.startTime + (ad.duration * 60 * 1000);
-        }
-        
-        function getAdStatus(ad) {
-            if (isExpired(ad)) return { text: 'Expirado', class: 'badge-expired' };
-            if (ad.active === false) return { text: 'Pausado', class: 'badge-inactive' };
-            return { text: 'Activo', class: 'badge-active' };
-        }
-        
-        function getNextBumpTime(ad) {
-            if (!ad.nextBumpTime) return '-';
-            const diff = ad.nextBumpTime - Date.now();
-            if (diff <= 0) return 'Ahora';
-            const mins = Math.floor(diff / 60000);
-            const secs = Math.floor((diff % 60000) / 1000);
-            return `${mins}m ${secs}s`;
-        }
-        
-        function getRemainingTime(ad) {
-            if (!ad.startTime || !ad.duration) return '-';
-            const end = ad.startTime + (ad.duration * 60 * 1000);
-            const diff = end - Date.now();
-            if (diff <= 0) return 'Expirado';
+        function releaseAccount(clientId) {
+            if (!confirm('🔓 ¿Liberar la cuenta de este cliente?\n\nLa cuenta quedará disponible para asignar a otro cliente.')) return;
             
-            const days = Math.floor(diff / (24 * 60 * 60 * 1000));
-            const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-            const mins = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+            const clients = getClients();
+            const client = clients[clientId];
+            if (!client) return;
             
-            if (days > 0) return `${days}d ${hours}h`;
-            if (hours > 0) return `${hours}h ${mins}m`;
-            return `${mins}m`;
+            // Liberar cuenta
+            const accounts = getAccounts();
+            if (accounts[client.accountId]) {
+                accounts[client.accountId].status = 'available';
+                accounts[client.accountId].currentClient = null;
+                saveAccounts(accounts);
+            }
+            
+            // Eliminar cliente o marcarlo como finalizado
+            client.active = false;
+            client.accountId = null;
+            saveClients(clients);
+            
+            updateAll();
         }
         
-        function formatDate(timestamp) {
-            if (!timestamp) return '-';
-            return new Date(timestamp).toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            });
-        }
-        
-        function copyLink(clientId) {
-            const link = `${DASHBOARD_BASE_URL}?client=${clientId}`;
-            copyToClipboard(link);
-        }
-        
-        function openLink(clientId) {
-            const link = `${DASHBOARD_BASE_URL}?client=${clientId}`;
-            window.open(link, '_blank');
-        }
-        
-        function copyClientLink() {
-            const link = document.getElementById('generatedClientLink').value;
-            copyToClipboard(link);
-        }
-        
-        function openClientLink() {
-            const link = document.getElementById('generatedClientLink').value;
-            window.open(link, '_blank');
-        }
-        
-        function copyAdId(adId) {
-            if (typeof adId === 'string') {
-                copyToClipboard(adId);
-            } else {
-                const id = document.getElementById('generatedAdId').value;
-                copyToClipboard(id);
+        function toggleClient(clientId) {
+            const clients = getClients();
+            if (clients[clientId]) {
+                clients[clientId].active = !clients[clientId].active;
+                saveClients(clients);
+                updateAll();
             }
         }
         
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                // Show temporary notification
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    background: linear-gradient(135deg, #00d4aa, #00b894);
-                    color: white;
-                    padding: 15px 25px;
-                    border-radius: 10px;
-                    font-weight: 500;
-                    z-index: 9999;
-                    animation: fadeIn 0.3s;
-                `;
-                notification.textContent = '✅ Copiado al portapapeles';
-                document.body.appendChild(notification);
+        function copyClientLink(clientId) {
+            const baseUrl = window.location.href.replace('admin_panel.html', 'client-multi-ads.html');
+            const clientLink = `${baseUrl}?id=${clientId}`;
+            navigator.clipboard.writeText(clientLink);
+            alert('✅ Link copiado!');
+        }
+        
+        function deleteClient(clientId) {
+            if (!confirm('¿Eliminar este cliente permanentemente?')) return;
+            
+            const clients = getClients();
+            const client = clients[clientId];
+            
+            // Liberar cuenta
+            if (client && client.accountId) {
+                const accounts = getAccounts();
+                if (accounts[client.accountId]) {
+                    accounts[client.accountId].status = 'available';
+                    accounts[client.accountId].currentClient = null;
+                    saveAccounts(accounts);
+                }
+            }
+            
+            delete clients[clientId];
+            saveClients(clients);
+            updateAll();
+        }
+        
+        function copyLink() {
+            const linkInput = document.getElementById('generatedLink');
+            linkInput.select();
+            document.execCommand('copy');
+            alert('✅ Link copiado!');
+        }
+        
+        function openLink() {
+            const link = document.getElementById('generatedLink').value;
+            window.open(link, '_blank');
+        }
+        
+        function filterClients() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#clientsTableBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+        
+        // ==================== MOVIMIENTOS FINANCIEROS ====================
+        function getMovements() {
+            return JSON.parse(localStorage.getItem('mp_movements') || '[]');
+        }
+        
+        function saveMovements(movements) {
+            localStorage.setItem('mp_movements', JSON.stringify(movements));
+        }
+        
+        function addMovement(type, description, amount) {
+            const movements = getMovements();
+            movements.unshift({
+                id: 'mov_' + Date.now(),
+                date: Date.now(),
+                type: type, // income, expense, loss, recovery
+                description: description,
+                amount: amount
+            });
+            saveMovements(movements);
+        }
+        
+        function updateMovementsTable() {
+            const movements = getMovements();
+            const tbody = document.getElementById('movementsTableBody');
+            
+            if (movements.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: #999;">No hay movimientos registrados</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = movements.slice(0, 50).map(mov => {
+                let typeText, typeColor;
+                switch(mov.type) {
+                    case 'income':
+                        typeText = '💰 Ingreso';
+                        typeColor = '#00ff88';
+                        break;
+                    case 'expense':
+                        typeText = '💸 Gasto';
+                        typeColor = '#ffa500';
+                        break;
+                    case 'loss':
+                        typeText = '🚫 Pérdida';
+                        typeColor = '#ff6b6b';
+                        break;
+                    case 'recovery':
+                        typeText = '✅ Recuperado';
+                        typeColor = '#00d4ff';
+                        break;
+                }
                 
-                setTimeout(() => notification.remove(), 2000);
+                const dateStr = new Date(mov.date).toLocaleString('es-ES');
+                const amountStr = mov.type === 'income' || mov.type === 'recovery' 
+                    ? `+$${mov.amount.toFixed(2)}` 
+                    : `-$${mov.amount.toFixed(2)}`;
+                
+                return `
+                    <tr>
+                        <td>${dateStr}</td>
+                        <td style="color:${typeColor}">${typeText}</td>
+                        <td>${mov.description}</td>
+                        <td style="color:${typeColor}; font-weight: bold;">${amountStr}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // ==================== RESUMEN FINANCIERO ====================
+        function updateFinanceSummary() {
+            const movements = getMovements();
+            
+            let totalIncome = 0;
+            let totalExpense = 0;
+            
+            movements.forEach(mov => {
+                if (mov.type === 'income') {
+                    totalIncome += mov.amount;
+                } else if (mov.type === 'expense' || mov.type === 'loss') {
+                    totalExpense += mov.amount;
+                } else if (mov.type === 'recovery') {
+                    totalExpense -= mov.amount; // Recuperar reduce los gastos
+                }
             });
-        }
-        
-        async function deleteClient(clientId) {
-            if (!confirm('¿Eliminar este cliente y todos sus datos?')) return;
             
-            try {
-                await fetch(`${FIREBASE_URL}/clientsInfo/${clientId}.json`, { method: 'DELETE' });
-                loadClients();
-            } catch (error) {
-                console.error('Error deleting client:', error);
+            const balance = totalIncome - totalExpense;
+            
+            document.getElementById('totalIncome').textContent = '$' + totalIncome.toFixed(2);
+            document.getElementById('totalExpense').textContent = '$' + totalExpense.toFixed(2);
+            document.getElementById('totalBalance').textContent = (balance >= 0 ? '+' : '') + '$' + balance.toFixed(2);
+            
+            // Color del balance
+            const balanceEl = document.getElementById('totalBalance');
+            if (balance > 0) {
+                balanceEl.className = 'finance-value positive';
+            } else if (balance < 0) {
+                balanceEl.className = 'finance-value negative';
+            } else {
+                balanceEl.className = 'finance-value neutral';
             }
         }
         
-        async function deleteAd(adId) {
-            if (!confirm('¿Eliminar este anuncio?')) return;
-            
-            try {
-                await fetch(`${FIREBASE_URL}/clients/${adId}.json`, { method: 'DELETE' });
-                loadAllAds();
-            } catch (error) {
-                console.error('Error deleting ad:', error);
-            }
+        // ==================== ACTUALIZAR TODO ====================
+        function updateAll() {
+            updateAccountsTable();
+            updateClientsTable();
+            updateMovementsTable();
+            updateFinanceSummary();
         }
         
-        // Initialize
-        loadDashboard();
-        setInterval(loadDashboard, 5000);
+        // Inicializar
+        updateAll();
+        setInterval(updateAll, 5000);
     </script>
 </body>
 </html>
