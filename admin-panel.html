@@ -662,6 +662,18 @@
                     <span class="nav-text">Nuevo Anuncio</span>
                 </a>
             </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Finanzas</div>
+                <a href="#" class="nav-item" onclick="showSection('finances')">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-text">Ganancias</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('blocked')">
+                    <span class="nav-icon">🚫</span>
+                    <span class="nav-text">Cuentas Bloqueadas</span>
+                </a>
+            </div>
         </nav>
     </aside>
     
@@ -889,6 +901,147 @@
                 </div>
             </div>
         </section>
+        
+        <!-- Finances Section -->
+        <section id="section-finances" style="display: none;">
+            <div class="header">
+                <h1>💰 Finanzas</h1>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card" style="border-color: rgba(0, 212, 170, 0.3);">
+                    <div class="stat-value" id="totalIncome" style="background: linear-gradient(135deg, #00d4aa, #00b894); -webkit-background-clip: text;">$0</div>
+                    <div class="stat-label">💵 Total Cobrado</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(255, 71, 87, 0.3);">
+                    <div class="stat-value" id="totalExpense" style="background: linear-gradient(135deg, #ff4757, #ff3344); -webkit-background-clip: text;">$0</div>
+                    <div class="stat-label">💸 Total Gastado</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(255, 105, 180, 0.3);">
+                    <div class="stat-value" id="totalBalance">$0</div>
+                    <div class="stat-label">📊 Balance</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(255, 165, 0, 0.3);">
+                    <div class="stat-value" id="totalLoss" style="background: linear-gradient(135deg, #ffa500, #ff8c00); -webkit-background-clip: text;">$0</div>
+                    <div class="stat-label">🚫 Pérdidas (Bloqueos)</div>
+                </div>
+            </div>
+            
+            <!-- Agregar Pago de Cliente -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon">💵</div>
+                        Registrar Pago de Cliente
+                    </div>
+                </div>
+                <form id="addPaymentForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Descripción *</label>
+                            <input type="text" id="paymentDesc" placeholder="Ej: Pago semana 1 - Juan" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Monto ($) *</label>
+                            <input type="number" id="paymentAmount" placeholder="100" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">💰 Registrar Ingreso</button>
+                </form>
+            </div>
+            
+            <!-- Agregar Gasto (Cuenta MP) -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon">💸</div>
+                        Registrar Compra de Cuenta MegaPersonals
+                    </div>
+                </div>
+                <form id="addExpenseForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Email de la Cuenta *</label>
+                            <input type="text" id="expenseEmail" placeholder="cuenta@ejemplo.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña *</label>
+                            <input type="text" id="expensePassword" placeholder="contraseña123" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Costo ($) *</label>
+                            <input type="number" id="expenseCost" placeholder="280" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-danger">💸 Registrar Gasto</button>
+                </form>
+            </div>
+            
+            <!-- Historial de Movimientos -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon">📋</div>
+                        Historial de Movimientos
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th>Monto</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movementsTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Blocked Accounts Section -->
+        <section id="section-blocked" style="display: none;">
+            <div class="header">
+                <h1>🚫 Cuentas Bloqueadas</h1>
+            </div>
+            
+            <div class="alert alert-info">
+                <span class="alert-icon">💡</span>
+                <div class="alert-content">
+                    <h4>Cuentas Bloqueadas</h4>
+                    <p>Aquí aparecen las cuentas de MegaPersonals que fueron bloqueadas. Estas se detectan automáticamente por el bot o puedes agregarlas manualmente. El costo de cada cuenta bloqueada se registra como pérdida.</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon">🚫</div>
+                        Lista de Cuentas Bloqueadas
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>📧 Email</th>
+                                <th>🔑 Contraseña</th>
+                                <th>💸 Costo (Pérdida)</th>
+                                <th>📅 Fecha Bloqueo</th>
+                                <th>Origen</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="blockedAccountsTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
     </main>
     
     <!-- Delete Confirmation Modal -->
@@ -923,6 +1076,8 @@
             if (sectionName === 'clients') loadClients();
             if (sectionName === 'ads') loadAllAds();
             if (sectionName === 'new-ad') loadClientSelect();
+            if (sectionName === 'finances') loadFinances();
+            if (sectionName === 'blocked') loadBlockedAccounts();
         }
         
         // Modal
@@ -1299,6 +1454,248 @@
             } catch (error) {
                 console.error('Error deleting ad:', error);
             }
+        }
+        
+        // ==================== FINANZAS ====================
+        async function loadFinances() {
+            try {
+                const [movementsRes, blockedRes] = await Promise.all([
+                    fetch(`${FIREBASE_URL}/movements.json`),
+                    fetch(`${FIREBASE_URL}/blockedAccounts.json`)
+                ]);
+                
+                const movements = await movementsRes.json() || {};
+                const blocked = await blockedRes.json() || {};
+                
+                let totalIncome = 0;
+                let totalExpense = 0;
+                let totalLoss = 0;
+                
+                // Calcular totales
+                Object.values(movements).forEach(mov => {
+                    if (mov.type === 'income') {
+                        totalIncome += mov.amount || 0;
+                    } else if (mov.type === 'expense') {
+                        totalExpense += mov.amount || 0;
+                    } else if (mov.type === 'loss') {
+                        totalLoss += mov.amount || 0;
+                    }
+                });
+                
+                // También sumar pérdidas de cuentas bloqueadas
+                Object.values(blocked).forEach(acc => {
+                    if (acc.cost) {
+                        totalLoss += acc.cost;
+                    }
+                });
+                
+                const balance = totalIncome - totalExpense - totalLoss;
+                
+                // Actualizar UI
+                document.getElementById('totalIncome').textContent = '$' + totalIncome.toFixed(2);
+                document.getElementById('totalExpense').textContent = '$' + totalExpense.toFixed(2);
+                document.getElementById('totalLoss').textContent = '$' + totalLoss.toFixed(2);
+                document.getElementById('totalBalance').textContent = (balance >= 0 ? '+' : '') + '$' + balance.toFixed(2);
+                
+                // Color del balance
+                const balanceEl = document.getElementById('totalBalance');
+                if (balance > 0) {
+                    balanceEl.style.background = 'linear-gradient(135deg, #00d4aa, #00b894)';
+                } else if (balance < 0) {
+                    balanceEl.style.background = 'linear-gradient(135deg, #ff4757, #ff3344)';
+                } else {
+                    balanceEl.style.background = 'linear-gradient(135deg, #ff69b4, #ff1493)';
+                }
+                balanceEl.style.webkitBackgroundClip = 'text';
+                
+                // Tabla de movimientos
+                const movArray = Object.entries(movements).map(([id, mov]) => ({ id, ...mov }));
+                movArray.sort((a, b) => (b.date || 0) - (a.date || 0));
+                
+                document.getElementById('movementsTable').innerHTML = movArray.length === 0 
+                    ? '<tr><td colspan="5" style="text-align: center; color: #666; padding: 30px;">No hay movimientos registrados</td></tr>'
+                    : movArray.slice(0, 50).map(mov => {
+                        let typeText, typeColor;
+                        if (mov.type === 'income') {
+                            typeText = '💰 Ingreso';
+                            typeColor = '#00d4aa';
+                        } else if (mov.type === 'expense') {
+                            typeText = '💸 Gasto';
+                            typeColor = '#ffa500';
+                        } else {
+                            typeText = '🚫 Pérdida';
+                            typeColor = '#ff4757';
+                        }
+                        
+                        const dateStr = mov.date ? new Date(mov.date).toLocaleDateString('es-ES') : '-';
+                        const amountStr = mov.type === 'income' ? '+$' + mov.amount.toFixed(2) : '-$' + mov.amount.toFixed(2);
+                        
+                        return `
+                            <tr>
+                                <td>${dateStr}</td>
+                                <td style="color: ${typeColor}">${typeText}</td>
+                                <td>${mov.description || '-'}</td>
+                                <td style="color: ${typeColor}; font-weight: 600;">${amountStr}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteMovement('${mov.id}')">🗑️</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                    
+            } catch (error) {
+                console.error('Error loading finances:', error);
+            }
+        }
+        
+        // Agregar pago (ingreso)
+        document.getElementById('addPaymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const desc = document.getElementById('paymentDesc').value.trim();
+            const amount = parseFloat(document.getElementById('paymentAmount').value) || 0;
+            
+            const movId = 'mov_' + Date.now();
+            
+            try {
+                await fetch(`${FIREBASE_URL}/movements/${movId}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'income',
+                        description: desc,
+                        amount: amount,
+                        date: Date.now()
+                    })
+                });
+                
+                e.target.reset();
+                loadFinances();
+                showNotification('✅ Ingreso registrado');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+        
+        // Agregar gasto (cuenta MP)
+        document.getElementById('addExpenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('expenseEmail').value.trim();
+            const password = document.getElementById('expensePassword').value.trim();
+            const cost = parseFloat(document.getElementById('expenseCost').value) || 0;
+            
+            const movId = 'mov_' + Date.now();
+            const accId = 'acc_' + Date.now();
+            
+            try {
+                // Registrar como gasto
+                await fetch(`${FIREBASE_URL}/movements/${movId}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'expense',
+                        description: `Cuenta MP: ${email}`,
+                        amount: cost,
+                        date: Date.now(),
+                        accountEmail: email
+                    })
+                });
+                
+                // Guardar cuenta activa
+                await fetch(`${FIREBASE_URL}/mpAccounts/${accId}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        cost: cost,
+                        status: 'active',
+                        createdAt: Date.now()
+                    })
+                });
+                
+                e.target.reset();
+                loadFinances();
+                showNotification('✅ Cuenta registrada');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+        
+        async function deleteMovement(movId) {
+            if (!confirm('¿Eliminar este movimiento?')) return;
+            
+            try {
+                await fetch(`${FIREBASE_URL}/movements/${movId}.json`, { method: 'DELETE' });
+                loadFinances();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        // ==================== CUENTAS BLOQUEADAS ====================
+        async function loadBlockedAccounts() {
+            try {
+                const response = await fetch(`${FIREBASE_URL}/blockedAccounts.json`);
+                const blocked = await response.json() || {};
+                
+                const blockedArray = Object.entries(blocked).map(([id, acc]) => ({ id, ...acc }));
+                blockedArray.sort((a, b) => (b.blockedAt || 0) - (a.blockedAt || 0));
+                
+                document.getElementById('blockedAccountsTable').innerHTML = blockedArray.length === 0
+                    ? '<tr><td colspan="6" style="text-align: center; color: #666; padding: 30px;">No hay cuentas bloqueadas</td></tr>'
+                    : blockedArray.map(acc => {
+                        const dateStr = acc.blockedAt ? new Date(acc.blockedAt).toLocaleDateString('es-ES') : '-';
+                        const origin = acc.reportedFrom === 'extension' ? '🤖 Bot' : '👤 Manual';
+                        const cost = acc.cost || 0;
+                        
+                        return `
+                            <tr style="background: rgba(255, 71, 87, 0.05);">
+                                <td style="font-family: monospace;">${acc.email || '-'}</td>
+                                <td style="font-family: monospace;">${acc.password || '-'}</td>
+                                <td style="color: #ff4757; font-weight: 600;">-$${cost.toFixed(2)}</td>
+                                <td>${dateStr}</td>
+                                <td><span class="badge badge-count">${origin}</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteBlockedAccount('${acc.id}')">🗑️</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                    
+            } catch (error) {
+                console.error('Error loading blocked accounts:', error);
+            }
+        }
+        
+        async function deleteBlockedAccount(accId) {
+            if (!confirm('¿Eliminar este registro de cuenta bloqueada?')) return;
+            
+            try {
+                await fetch(`${FIREBASE_URL}/blockedAccounts/${accId}.json`, { method: 'DELETE' });
+                loadBlockedAccounts();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #00d4aa, #00b894);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                font-weight: 500;
+                z-index: 9999;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
         }
         
         // Initialize
