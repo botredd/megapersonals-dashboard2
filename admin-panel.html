@@ -948,8 +948,28 @@
         }
         
         // ==================== CLIENTES ====================
-        function getClients() {
-            // Intentar leer del nuevo formato primero
+        // Cache de clientes
+        let clientsCache = null;
+        
+        async function getClients() {
+            // Si hay cache, usarlo
+            if (clientsCache) return clientsCache;
+            
+            try {
+                // Leer desde Firebase
+                const response = await fetch(`${FIREBASE_URL}/clients.json`);
+                const firebaseClients = await response.json();
+                
+                if (firebaseClients && Object.keys(firebaseClients).length > 0) {
+                    console.log('📦 Clientes cargados desde Firebase:', Object.keys(firebaseClients).length);
+                    clientsCache = firebaseClients;
+                    return firebaseClients;
+                }
+            } catch (error) {
+                console.error('Error leyendo Firebase:', error);
+            }
+            
+            // Fallback a localStorage
             let clients = JSON.parse(localStorage.getItem('mp_clients') || '{}');
             
             // Si está vacío, intentar migrar del formato anterior
@@ -957,7 +977,6 @@
                 const oldClients = JSON.parse(localStorage.getItem('megapersonals_clients') || '{}');
                 if (Object.keys(oldClients).length > 0) {
                     console.log('📦 Migrando clientes del formato anterior...');
-                    // Migrar al nuevo formato
                     for (const [id, client] of Object.entries(oldClients)) {
                         clients[id] = {
                             ...client,
@@ -972,16 +991,20 @@
                         };
                     }
                     saveClients(clients);
-                    console.log('✅ Migración completada:', Object.keys(clients).length, 'clientes');
                 }
             }
             
+            clientsCache = clients;
             return clients;
         }
         
-        function saveClients(clients) {
+        async function saveClients(clients) {
             localStorage.setItem('mp_clients', JSON.stringify(clients));
+            clientsCache = clients;
         }
+        
+        // Limpiar cache cada 5 segundos para refrescar
+        setInterval(() => { clientsCache = null; }, 5000);
         
         document.getElementById('addClientForm').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -1052,8 +1075,8 @@
             }, 3000);
         });
         
-        function updateClientsTable() {
-            const clients = getClients();
+        async function updateClientsTable() {
+            const clients = await getClients();
             const clientsArray = Object.values(clients);
             const accounts = getAccounts();
             const tbody = document.getElementById('clientsTableBody');
@@ -1072,7 +1095,10 @@
                 const isActive = client.active && !isExpired;
                 
                 let status, statusClass;
-                if (isExpired) {
+                if (client.accountBlocked) {
+                    status = '🚫 Bloqueado';
+                    statusClass = 'status-blocked';
+                } else if (isExpired) {
                     status = 'Expirado';
                     statusClass = 'status-expired';
                 } else if (isActive) {
@@ -1092,20 +1118,32 @@
                     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
                 
-                const account = accounts[client.accountId];
-                const accountName = account ? account.name : 'Sin cuenta';
+                // Buscar cuenta asignada
+                let accountName = 'Sin cuenta';
+                if (client.accountId && accounts[client.accountId]) {
+                    accountName = accounts[client.accountId].name;
+                }
+                
+                // Info de pagos
+                const totalPaid = client.totalPaid || 0;
+                const paymentsCount = client.payments ? client.payments.length : 0;
+                
+                // Info del anuncio
+                const phone = client.phone || client.adPhone || '-';
+                const city = client.city || client.adCity || '';
                 
                 return `
                     <tr>
                         <td>
                             <strong>${client.name}</strong>
-                            ${client.phone ? `<br><small style="color:#999">${client.phone}</small>` : ''}
+                            ${phone !== '-' ? `<br><small style="color:#00ff88">📞 ${phone}</small>` : ''}
+                            ${city ? `<br><small style="color:#999">📍 ${city}</small>` : ''}
                         </td>
                         <td>${accountName}</td>
                         <td><span class="status-badge ${statusClass}">${status}</span></td>
                         <td>
-                            <strong style="color:#00ff88">$${client.totalPaid.toFixed(2)}</strong>
-                            <br><small style="color:#999">${client.payments.length} pago(s)</small>
+                            <strong style="color:#00ff88">$${totalPaid.toFixed(2)}</strong>
+                            <br><small style="color:#999">${paymentsCount} pago(s)</small>
                         </td>
                         <td>${remainingStr}</td>
                         <td>${endDateStr}</td>
@@ -1115,7 +1153,6 @@
                             <button onclick="toggleClient('${client.id}')" class="btn-warning btn-small" title="${isActive ? 'Pausar' : 'Activar'}">
                                 ${isActive ? '⏸️' : '▶️'}
                             </button>
-                            <button onclick="releaseAccount('${client.id}')" class="btn-primary btn-small" title="Liberar cuenta">🔓</button>
                             <button onclick="deleteClient('${client.id}')" class="btn-danger btn-small" title="Eliminar">🗑️</button>
                         </td>
                     </tr>
@@ -1123,8 +1160,8 @@
             }).join('');
         }
         
-        function openRenewModal(clientId) {
-            const clients = getClients();
+        async function openRenewModal(clientId) {
+            const clients = await getClients();
             const client = clients[clientId];
             if (!client) return;
             
@@ -1194,11 +1231,21 @@
             updateAll();
         }
         
-        function toggleClient(clientId) {
-            const clients = getClients();
+        async function toggleClient(clientId) {
+            const clients = await getClients();
             if (clients[clientId]) {
                 clients[clientId].active = !clients[clientId].active;
-                saveClients(clients);
+                await saveClients(clients);
+                
+                // También actualizar en Firebase
+                try {
+                    await fetch(`${FIREBASE_URL}/clients/${clientId}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ active: clients[clientId].active })
+                    });
+                } catch (e) { console.error(e); }
+                
                 updateAll();
             }
         }
@@ -1210,13 +1257,13 @@
             alert('✅ Link copiado!');
         }
         
-        function deleteClient(clientId) {
+        async function deleteClient(clientId) {
             if (!confirm('¿Eliminar este cliente permanentemente?')) return;
             
-            const clients = getClients();
+            const clients = await getClients();
             const client = clients[clientId];
             
-            // Liberar cuenta
+            // Liberar cuenta si tiene
             if (client && client.accountId) {
                 const accounts = getAccounts();
                 if (accounts[client.accountId]) {
@@ -1227,7 +1274,13 @@
             }
             
             delete clients[clientId];
-            saveClients(clients);
+            await saveClients(clients);
+            
+            // También eliminar de Firebase
+            try {
+                await fetch(`${FIREBASE_URL}/clients/${clientId}.json`, { method: 'DELETE' });
+            } catch (e) { console.error(e); }
+            
             updateAll();
         }
         
@@ -1354,9 +1407,9 @@
         }
         
         // ==================== ACTUALIZAR TODO ====================
-        function updateAll() {
+        async function updateAll() {
             updateAccountsTable();
-            updateClientsTable();
+            await updateClientsTable();
             updateMovementsTable();
             updateFinanceSummary();
         }
