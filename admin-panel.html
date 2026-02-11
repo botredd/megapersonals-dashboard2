@@ -490,7 +490,7 @@
                         </div>
                         <div class="form-group">
                             <label>💵 Pago del Cliente ($)</label>
-                            <input type="number" id="clientPayment" placeholder="100" min="0" step="0.01" required>
+                            <input type="number" id="clientPayment" placeholder="100" min="0" step="0.01">
                         </div>
                         <div class="form-group">
                             <label>Teléfono</label>
@@ -949,7 +949,34 @@
         
         // ==================== CLIENTES ====================
         function getClients() {
-            return JSON.parse(localStorage.getItem('mp_clients') || '{}');
+            // Intentar leer del nuevo formato primero
+            let clients = JSON.parse(localStorage.getItem('mp_clients') || '{}');
+            
+            // Si está vacío, intentar migrar del formato anterior
+            if (Object.keys(clients).length === 0) {
+                const oldClients = JSON.parse(localStorage.getItem('megapersonals_clients') || '{}');
+                if (Object.keys(oldClients).length > 0) {
+                    console.log('📦 Migrando clientes del formato anterior...');
+                    // Migrar al nuevo formato
+                    for (const [id, client] of Object.entries(oldClients)) {
+                        clients[id] = {
+                            ...client,
+                            payments: [{
+                                date: client.createdAt || Date.now(),
+                                amount: 0,
+                                type: 'initial',
+                                note: 'Migrado del sistema anterior'
+                            }],
+                            totalPaid: 0,
+                            accountId: null
+                        };
+                    }
+                    saveClients(clients);
+                    console.log('✅ Migración completada:', Object.keys(clients).length, 'clientes');
+                }
+            }
+            
+            return clients;
         }
         
         function saveClients(clients) {
@@ -959,11 +986,7 @@
         document.getElementById('addClientForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
-            const accountId = document.getElementById('mpAccount').value;
-            if (!accountId) {
-                alert('⚠️ Selecciona una cuenta MegaPersonals');
-                return;
-            }
+            const accountId = document.getElementById('mpAccount').value || null;
             
             const clientId = 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             const payment = parseFloat(document.getElementById('clientPayment').value) || 0;
@@ -991,12 +1014,14 @@
                 createdAt: Date.now()
             };
             
-            // Actualizar cuenta MP
-            const accounts = getAccounts();
-            if (accounts[accountId]) {
-                accounts[accountId].status = 'in_use';
-                accounts[accountId].currentClient = clientId;
-                saveAccounts(accounts);
+            // Actualizar cuenta MP si se seleccionó una
+            if (accountId) {
+                const accounts = getAccounts();
+                if (accounts[accountId]) {
+                    accounts[accountId].status = 'in_use';
+                    accounts[accountId].currentClient = clientId;
+                    saveAccounts(accounts);
+                }
             }
             
             // Guardar cliente
@@ -1004,8 +1029,10 @@
             clients[clientId] = client;
             saveClients(clients);
             
-            // Registrar ingreso
-            addMovement('income', `Pago inicial: ${client.name}`, payment);
+            // Registrar ingreso si hay pago
+            if (payment > 0) {
+                addMovement('income', `Pago inicial: ${client.name}`, payment);
+            }
             
             // Generar link
             const baseUrl = window.location.href.replace('admin_panel.html', 'client-multi-ads.html');
