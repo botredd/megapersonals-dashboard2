@@ -860,7 +860,7 @@
                 <span class="alert-icon">💡</span>
                 <div class="alert-content">
                     <h4>Crear un Anuncio</h4>
-                    <p>Solo necesitas asignar el anuncio a un cliente. El teléfono, ciudad y duración se configuran automáticamente desde el bot.</p>
+                    <p>Asigna el anuncio a un cliente, registra cuánto pagó y si usas una cuenta nueva de MegaPersonals.</p>
                 </div>
             </div>
             
@@ -885,7 +885,38 @@
                             <input type="text" id="adName" placeholder="Ej: Anuncio 1, Principal, etc.">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">
+                    
+                    <div class="form-grid" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div class="form-group">
+                            <label>💵 Pago del Cliente ($) *</label>
+                            <input type="number" id="adClientPayment" placeholder="100" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>📅 Duración (días)</label>
+                            <input type="number" id="adDuration" placeholder="7" min="1" value="7">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 20px; background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 12px;">
+                        <h4 style="color: #ffa500; margin-bottom: 15px;">💸 ¿Usas una cuenta MegaPersonals nueva?</h4>
+                        <p style="color: #888; font-size: 0.85em; margin-bottom: 15px;">Solo llena esto si compraste una cuenta nueva para este anuncio. Si reusas una cuenta existente, déjalo vacío.</p>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Email de la cuenta</label>
+                                <input type="text" id="adMpEmail" placeholder="cuenta@ejemplo.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Contraseña</label>
+                                <input type="text" id="adMpPassword" placeholder="contraseña123">
+                            </div>
+                            <div class="form-group">
+                                <label>Costo de la cuenta ($)</label>
+                                <input type="number" id="adMpCost" placeholder="280" min="0" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top: 20px;">
                         ✅ Crear Anuncio
                     </button>
                 </form>
@@ -1307,18 +1338,77 @@
             
             const adId = 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             const now = Date.now();
+            const clientPayment = parseFloat(document.getElementById('adClientPayment').value) || 0;
+            const duration = parseInt(document.getElementById('adDuration').value) || 7;
+            const mpEmail = document.getElementById('adMpEmail').value.trim();
+            const mpPassword = document.getElementById('adMpPassword').value.trim();
+            const mpCost = parseFloat(document.getElementById('adMpCost').value) || 0;
             
             try {
+                // Crear el anuncio
                 await fetch(`${FIREBASE_URL}/clients/${adId}.json`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         clientId,
                         name: name || 'Anuncio',
-                        active: false, // Inactivo hasta que el bot lo configure
-                        createdAt: now
+                        active: false,
+                        createdAt: now,
+                        duration: duration * 24 * 60, // Convertir días a minutos
+                        clientPayment: clientPayment,
+                        mpEmail: mpEmail || null,
+                        mpCost: mpCost || null
                     })
                 });
+                
+                // Registrar el pago del cliente como ingreso
+                if (clientPayment > 0) {
+                    const clientInfo = await fetch(`${FIREBASE_URL}/clientsInfo/${clientId}.json`).then(r => r.json());
+                    const clientName = clientInfo?.name || 'Cliente';
+                    
+                    await fetch(`${FIREBASE_URL}/movements/mov_${now}.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'income',
+                            description: `Pago: ${clientName} - ${name || 'Anuncio'}`,
+                            amount: clientPayment,
+                            date: now,
+                            adId: adId,
+                            clientId: clientId
+                        })
+                    });
+                }
+                
+                // Si hay cuenta MP nueva, registrar el gasto
+                if (mpEmail && mpCost > 0) {
+                    await fetch(`${FIREBASE_URL}/movements/mov_${now + 1}.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'expense',
+                            description: `Cuenta MP: ${mpEmail}`,
+                            amount: mpCost,
+                            date: now,
+                            adId: adId,
+                            accountEmail: mpEmail
+                        })
+                    });
+                    
+                    // Guardar la cuenta MP
+                    await fetch(`${FIREBASE_URL}/mpAccounts/acc_${now}.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: mpEmail,
+                            password: mpPassword,
+                            cost: mpCost,
+                            status: 'active',
+                            adId: adId,
+                            createdAt: now
+                        })
+                    });
+                }
                 
                 document.getElementById('generatedAdId').value = adId;
                 document.getElementById('adIdDisplay').style.display = 'flex';
@@ -1326,6 +1416,7 @@
                 
                 // Reset form
                 e.target.reset();
+                document.getElementById('adDuration').value = '7';
                 
                 setTimeout(() => {
                     document.getElementById('adSuccessMessage').style.display = 'none';
