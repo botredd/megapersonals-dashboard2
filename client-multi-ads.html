@@ -373,6 +373,17 @@
             box-shadow: 0 5px 20px rgba(153,50,204,0.4);
         }
         
+        .btn-reload {
+            background: linear-gradient(135deg, #00bcd4, #0097a7);
+            color: white;
+            grid-column: 1 / -1;
+        }
+        
+        .btn-reload:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(0,188,212,0.4);
+        }
+        
         .btn-disabled {
             background: #444;
             color: #888;
@@ -1658,6 +1669,7 @@
                     <div class="btn-group">
                         ${actionBtn}
                         ${editBtn}
+                        <button class="btn btn-reload" onclick="location.reload()">🔄 Recargar</button>
                     </div>
                 </div>
             `;
