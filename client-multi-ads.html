@@ -1062,6 +1062,38 @@
             }
         }
         
+        // Solicitar recarga de la página de MegaPersonals (vía la extensión)
+        async function requestReload(adId) {
+            try {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '⏳ Enviando orden...';
+                btn.disabled = true;
+                
+                // Enviar señal a Firebase para que la extensión la detecte
+                await fetch(`${FIREBASE_URL}/reloadRequests/${adId}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        requestedAt: Date.now(),
+                        status: 'pending'
+                    })
+                });
+                
+                btn.innerHTML = '✅ Orden enviada!';
+                
+                // Mostrar mensaje al usuario
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Error al solicitar recarga:', error);
+                alert('Error al enviar la orden de recarga');
+            }
+        }
+        
         // Abrir modal de edición
         async function openEditModal(adId) {
             currentEditAdId = adId;
@@ -1669,7 +1701,7 @@
                     <div class="btn-group">
                         ${actionBtn}
                         ${editBtn}
-                        <button class="btn btn-reload" onclick="window.top.location.reload(true); return false;">🔄 Recargar</button>
+                        <button class="btn btn-reload" onclick="requestReload('${ad.id}')">🔄 Recargar</button>
                     </div>
                 </div>
             `;
