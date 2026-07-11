@@ -1581,14 +1581,23 @@
         // Renderizar anuncio
         function renderAd(ad) {
             const now = Date.now();
-            const endTime = ad.startTime + (ad.duration * 60 * 1000);
-            const isExpired = now >= endTime;
-            const isActive = ad.active && !isExpired;
+            const totalPausedTime = ad.totalPausedTime || 0;
+            const endTime = ad.startTime + (ad.duration * 60 * 1000) + totalPausedTime;
+            
+            // Si el tiempo está pausado, calcular basado en pausedAt
+            const isTimePaused = ad.timePaused === true;
+            const effectiveNow = isTimePaused && ad.pausedAt ? ad.pausedAt : now;
+            
+            const isExpired = !isTimePaused && (now >= endTime);
+            const isActive = ad.active && !isExpired && !isTimePaused;
             const isEditing = ad.editStatus === 'editing';
             
             // Estado
             let statusClass, statusText;
-            if (isEditing) {
+            if (isTimePaused) {
+                statusClass = 'status-paused';
+                statusText = '⏸️ Servicio en Pausa';
+            } else if (isEditing) {
                 statusClass = 'status-editing';
                 statusText = 'Editando...';
             } else if (isExpired) {
@@ -1606,18 +1615,25 @@
             const timeToNextBump = Math.max(0, ad.nextBumpTime - now);
             const bumpMinutes = Math.floor(timeToNextBump / 60000);
             const bumpSeconds = Math.floor((timeToNextBump % 60000) / 1000);
-            const nextBumpStr = isExpired ? '--:--' : 
+            const nextBumpStr = (isExpired || isTimePaused) ? '--:--' : 
                 `${String(bumpMinutes).padStart(2, '0')}:${String(bumpSeconds).padStart(2, '0')}`;
             
-            // Tiempo restante
-            const remaining = Math.max(0, endTime - now);
+            // Tiempo restante (respetando pausa)
+            const timeReference = isTimePaused ? ad.pausedAt : now;
+            const remaining = Math.max(0, endTime - timeReference);
             const days = Math.floor(remaining / (24 * 60 * 60 * 1000));
             const hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
             const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
             const seconds = Math.floor((remaining % 60000) / 1000);
             
             let remainingStr;
-            if (isExpired) {
+            if (isTimePaused) {
+                if (days > 0) {
+                    remainingStr = `⏸️ ${days}d ${hours}h ${minutes}m`;
+                } else {
+                    remainingStr = `⏸️ ${hours}h ${minutes}m`;
+                }
+            } else if (isExpired) {
                 remainingStr = 'Expirado';
             } else if (days > 0) {
                 remainingStr = `${days}d ${hours}h ${minutes}m ${seconds}s`;
