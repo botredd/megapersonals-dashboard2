@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de tu Anuncio - MegaPersonals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            font-size: 2em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .status-header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            color: white;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .status-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-active {
+            background: #00ff88;
+            box-shadow: 0 0 20px #00ff88;
+        }
+        
+        .status-inactive {
+            background: #ff6b6b;
+            box-shadow: 0 0 20px #ff6b6b;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
+        }
+        
+        .info-section {
+            margin: 25px 0;
+        }
+        
+        .info-title {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .progress-container {
+            background: #e0e0e0;
+            height: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 15px;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.5s ease;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255,255,255,0.3), 
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            line-height: 25px;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .detail-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .alert {
+            background: rgba(255, 193, 7, 0.9);
+            color: #333;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .error {
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            font-size: 0.9em;
+        }
+        
+        .refresh-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #00ff88;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .btn-control {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-pause {
+            background: linear-gradient(135deg, #ff9500, #ff6b00);
+            color: white;
+        }
+        
+        .btn-pause:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 149, 0, 0.4);
+        }
+        
+        .btn-resume {
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: white;
+        }
+        
+        .btn-resume:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.4);
+        }
+        
+        .btn-control:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status-message {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: rgba(0, 212, 170, 0.2);
+            color: #00b894;
+            display: block;
+        }
+        
+        .status-message.paused {
+            background: rgba(255, 149, 0, 0.2);
+            color: #ff9500;
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .info-value {
+                font-size: 2em;
+            }
+            
+            .logo h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>📱 Estado de tu Anuncio</h1>
+            <p>MegaPersonals - Seguimiento en Tiempo Real</p>
+        </div>
+        
+        <div id="errorAlert" class="alert error" style="display: none;">
+            ⚠️ Link inválido o anuncio no encontrado
+        </div>
+        
+        <div class="card">
+            <div class="status-header">
+                <div>Estado Actual</div>
+                <div id="statusIndicator" class="status-indicator">
+                    <div class="status-dot status-inactive"></div>
+                    <span>Cargando...</span>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">⏰ Próxima Publicación en:</div>
+                <div id="nextBump" class="info-value">--:--</div>
+                <div class="progress-container">
+                    <div id="nextBumpBar" class="progress-bar" style="width: 0%"></div>
+                    <div id="nextBumpPercent" class="progress-text">0%</div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">⏳ Tiempo Restante de Servicio:</div>
+                <div id="timeRemaining" class="info-value">--:--</div>
+                <div class="progress-container">
+                    <div id="timeRemainingBar" class="progress-bar" style="width: 0%; background: linear-gradient(90deg, #ff9900, #ff6600);"></div>
+                    <div id="timeRemainingPercent" class="progress-text">0%</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+                <div class="detail-row">
+                    <span class="detail-label">📅 Servicio Finaliza:</span>
+                    <span id="endTime" class="detail-value">--:--</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">🔄 Publicaciones Restantes:</span>
+                    <span id="bumpsRemaining" class="detail-value">0</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">📊 Total de Publicaciones:</span>
+                    <span id="totalBumps" class="detail-value">0</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">🕐 Última Actualización:</span>
+                    <span id="lastUpdate" class="detail-value">--:--:--</span>
+                </div>
+            </div>
+            
+            <div class="control-buttons">
+                <button id="btnPause" class="btn-control btn-pause" onclick="pauseService()">
+                    ⏸️ Pausar
+                </button>
+                <button id="btnResume" class="btn-control btn-resume" onclick="resumeService()">
+                    ▶️ Reanudar
+                </button>
+            </div>
+            
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+        
+        <div class="footer">
+            <div>
+                <span class="refresh-indicator"></span>
+                Actualización automática cada segundo
+            </div>
+            <div style="margin-top: 10px; opacity: 0.8;">
+                💡 Guarda este link para consultar el estado cuando quieras
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const BUMP_INTERVAL = 16; // minutos
+        const FIREBASE_URL = 'https://ezequielredd-default-rtdb.firebaseio.com';
+        
+        // Obtener ID del cliente desde la URL
+        function getClientId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+        
+        // Pausar servicio
+        async function pauseService() {
+            const clientId = getClientId();
+            if (!clientId) return;
+            
+            const btnPause = document.getElementById('btnPause');
+            btnPause.disabled = true;
+            btnPause.textContent = '⏳ Pausando...';
+            
+            try {
+                const response = await fetch(`${FIREBASE_URL}/clients/${clientId}/active.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(false)
+                });
+                
+                if (response.ok) {
+                    showStatusMessage('⏸️ Servicio pausado', 'paused');
+                    updateButtonStates(false);
+                }
+            } catch (error) {
+                console.error('Error al pausar:', error);
+            }
+            
+            btnPause.disabled = false;
+            btnPause.innerHTML = '⏸️ Pausar';
+        }
+        
+        // Reanudar servicio
+        async function resumeService() {
+            const clientId = getClientId();
+            if (!clientId) return;
+            
+            const btnResume = document.getElementById('btnResume');
+            btnResume.disabled = true;
+            btnResume.textContent = '⏳ Reanudando...';
+            
+            try {
+                // Reactivar y actualizar nextBumpTime
+                const now = Date.now();
+                const updates = {
+                    active: true,
+                    nextBumpTime: now + (BUMP_INTERVAL * 60 * 1000),
+                    lastSync: now
+                };
+                
+                const response = await fetch(`${FIREBASE_URL}/clients/${clientId}.json`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+                
+                if (response.ok) {
+                    showStatusMessage('▶️ Servicio reanudado', 'success');
+                    updateButtonStates(true);
+                }
+            } catch (error) {
+                console.error('Error al reanudar:', error);
+            }
+            
+            btnResume.disabled = false;
+            btnResume.innerHTML = '▶️ Reanudar';
+        }
+        
+        // Mostrar mensaje de estado
+        function showStatusMessage(message, type) {
+            const msgElement = document.getElementById('statusMessage');
+            msgElement.textContent = message;
+            msgElement.className = `status-message ${type}`;
+            
+            setTimeout(() => {
+                msgElement.className = 'status-message';
+            }, 3000);
+        }
+        
+        // Actualizar estado de los botones
+        function updateButtonStates(isActive) {
+            const btnPause = document.getElementById('btnPause');
+            const btnResume = document.getElementById('btnResume');
+            
+            if (isActive) {
+                btnPause.style.display = 'flex';
+                btnResume.style.display = 'none';
+            } else {
+                btnPause.style.display = 'none';
+                btnResume.style.display = 'flex';
+            }
+        }
+        
+        // Obtener datos del cliente desde Firebase
+        async function getClientData() {
+            const clientId = getClientId();
+            if (!clientId) {
+                showError();
+                return null;
+            }
+            
+            try {
+                const response = await fetch(`${FIREBASE_URL}/clients/${clientId}.json`);
+                const clientData = await response.json();
+                
+                if (!clientData) {
+                    showError();
+                    return null;
+                }
+                
+                return clientData;
+            } catch (error) {
+                console.error('Error al obtener datos:', error);
+                showError();
+                return null;
+            }
+        }
+        
+        // Mostrar error
+        function showError() {
+            document.getElementById('errorAlert').style.display = 'block';
+            document.querySelector('.card').style.display = 'none';
+        }
+        
+        // Actualizar dashboard
+        async function updateDashboard() {
+            const data = await getClientData();
+            if (!data) return;
+            
+            const now = Date.now();
+            
+            console.log('Datos recibidos:', data);
+            console.log('nextBumpTime:', data.nextBumpTime, 'now:', now, 'diff:', data.nextBumpTime - now);
+            
+            // Actualizar estado
+            const statusElement = document.getElementById('statusIndicator');
+            const statusDot = statusElement.querySelector('.status-dot');
+            const statusText = statusElement.querySelector('span');
+            
+            const endTime = data.startTime + (data.duration * 60 * 1000);
+            const isExpired = now >= endTime;
+            const isActive = data.active && !isExpired;
+            
+            if (isActive) {
+                statusDot.className = 'status-dot status-active';
+                statusText.textContent = '🟢 Activo';
+            } else if (isExpired) {
+                statusDot.className = 'status-dot status-inactive';
+                statusText.textContent = '⏹️ Finalizado';
+            } else {
+                statusDot.className = 'status-dot status-inactive';
+                statusText.textContent = '⏸️ Pausado';
+            }
+            
+            // Actualizar botones según el estado
+            updateButtonStates(data.active && !isExpired);
+            
+            // Ocultar botones si expiró
+            if (isExpired) {
+                document.getElementById('btnPause').style.display = 'none';
+                document.getElementById('btnResume').style.display = 'none';
+            }
+            
+            // Próximo bump - TIEMPO REAL desde Firebase
+            const timeToNextBump = data.nextBumpTime - now;
+            console.log('timeToNextBump:', timeToNextBump);
+            
+            if (!isExpired && timeToNextBump > 0) {
+                const minutes = Math.floor(timeToNextBump / 60000);
+                const seconds = Math.floor((timeToNextBump % 60000) / 1000);
+                
+                console.log('Minutos:', minutes, 'Segundos:', seconds);
+                
+                document.getElementById('nextBump').textContent = 
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                
+                const bumpTotal = BUMP_INTERVAL * 60 * 1000;
+                const bumpElapsed = bumpTotal - timeToNextBump;
+                const bumpProgress = Math.min(100, Math.max(0, (bumpElapsed / bumpTotal) * 100));
+                
+                document.getElementById('nextBumpBar').style.width = `${bumpProgress}%`;
+                document.getElementById('nextBumpPercent').textContent = `${Math.round(bumpProgress)}%`;
+            } else if (timeToNextBump <= 0 && !isExpired) {
+                // El tiempo pasó pero el servicio sigue activo - mostrar que está procesando
+                document.getElementById('nextBump').textContent = 'Procesando...';
+                document.getElementById('nextBumpBar').style.width = '100%';
+                document.getElementById('nextBumpPercent').textContent = '100%';
+            } else {
+                document.getElementById('nextBump').textContent = 'Finalizado';
+                document.getElementById('nextBumpBar').style.width = '100%';
+                document.getElementById('nextBumpPercent').textContent = '100%';
+            }
+            
+            // Tiempo restante
+            const remaining = Math.max(0, endTime - now);
+            const hours = Math.floor(remaining / (60 * 60 * 1000));
+            const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            
+            let timeStr = '';
+            if (remaining === 0) {
+                timeStr = 'Expirado';
+            } else {
+                if (hours > 0) timeStr += `${String(hours).padStart(2, '0')}:`;
+                timeStr += `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+            
+            document.getElementById('timeRemaining').textContent = timeStr;
+            
+            const elapsed = now - data.startTime;
+            const total = data.duration * 60 * 1000;
+            const totalProgress = Math.min(100, (elapsed / total) * 100);
+            
+            document.getElementById('timeRemainingBar').style.width = `${totalProgress}%`;
+            document.getElementById('timeRemainingPercent').textContent = `${Math.round(totalProgress)}%`;
+            
+            // Detalles
+            document.getElementById('endTime').textContent = new Date(endTime).toLocaleString('es-ES', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const remainingMinutes = remaining / 60000;
+            const bumpsRemaining = Math.floor(remainingMinutes / BUMP_INTERVAL);
+            document.getElementById('bumpsRemaining').textContent = bumpsRemaining;
+            
+            const totalPossibleBumps = Math.floor(data.duration / BUMP_INTERVAL);
+            document.getElementById('totalBumps').textContent = totalPossibleBumps;
+            
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('es-ES');
+        }
+        
+        // Inicializar
+        const clientId = getClientId();
+        if (!clientId) {
+            showError();
+        } else {
+            // Actualizar inmediatamente
+            updateDashboard();
+            
+            // Actualizar cada segundo
+            setInterval(updateDashboard, 1000);
+        }
+    </script>
+</body>
+</html>
