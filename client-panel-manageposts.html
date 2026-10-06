@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Posts - Mi Anuncio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(180deg, #fff5f7 0%, #ffe8ee 40%, #fff0f3 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #fffafb;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(200, 50, 80, 0.12);
+            overflow: hidden;
+            border: 1px solid #ffd0d8;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, #ff6b9d, #ff2e63);
+            padding: 20px 15px 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            width: 200%; height: 200%;
+            top: -50%; left: -50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+            animation: bubble 8s infinite linear;
+        }
+        @keyframes bubble {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .logo-area { position: relative; z-index: 2; }
+        .logo-icon {
+            width: 70px; height: 70px;
+            background: white; border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .logo-text {
+            font-size: 1.6em; font-weight: 700; color: white;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+        .logo-sub { color: rgba(255,255,255,0.9); font-size: 0.85em; margin-top: 4px; }
+
+        /* ===== BOTONES ===== */
+        .main-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 20px 18px 10px;
+        }
+        .btn {
+            padding: 14px 10px;
+            border: none; border-radius: 12px;
+            font-weight: 700; font-size: 0.95em;
+            cursor: pointer; transition: all 0.25s ease;
+            font-family: inherit; text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-edit {
+            background: linear-gradient(135deg, #ff6b9d, #ff2e63);
+            color: white; grid-column: 1 / -1;
+        }
+        .btn-edit:hover { box-shadow: 0 6px 20px rgba(255, 46, 99, 0.4); }
+        .btn-pause { background: linear-gradient(135deg, #ff9500, #ff6b00); color: white; }
+        .btn-resume { background: linear-gradient(135deg, #00d4aa, #00b894); color: white; }
+        .btn-manual {
+            background: linear-gradient(135deg, #4facfe, #00c6fb);
+            color: white; grid-column: 1 / -1;
+        }
+        .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; }
+
+        /* ===== CURRENT POST ===== */
+        .current-post { padding: 10px 18px 25px; }
+        .section-title {
+            text-align: center; font-size: 1.15em; font-weight: 700;
+            color: #c41e3a; margin: 15px 0 12px; position: relative;
+        }
+        .section-title::before, .section-title::after {
+            content: ''; position: absolute; top: 50%; width: 60px; height: 2px;
+        }
+        .section-title::before { left: 10px; background: linear-gradient(90deg, transparent, #c41e3a); }
+        .section-title::after { right: 10px; background: linear-gradient(90deg, #c41e3a, transparent); }
+
+        .ad-headline {
+            background: linear-gradient(135deg, #fff0f3, #ffe4ea);
+            border: 1px solid #ffb6c1; border-radius: 12px;
+            padding: 12px 14px; margin-bottom: 14px;
+            font-size: 0.95em; font-weight: 600; color: #8b0030;
+            line-height: 1.4; text-align: center;
+        }
+        .info-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px 16px; margin-bottom: 14px; font-size: 0.9em;
+        }
+        .info-item { display: flex; gap: 6px; }
+        .info-label { color: #c41e3a; font-weight: 600; white-space: nowrap; }
+        .info-value { color: #333; font-weight: 500; }
+        .info-full { grid-column: 1 / -1; }
+
+        .ad-body {
+            background: #fff8f9; border: 1px solid #ffd0d8;
+            border-radius: 12px; padding: 14px; margin-bottom: 18px;
+            font-size: 0.9em; line-height: 1.55; color: #444;
+            white-space: pre-wrap;
+        }
+
+        /* Fotos filmstrip */
+        .photo-frame {
+            background: #fff; border: 3px solid #ffb6c1;
+            border-radius: 8px; padding: 6px; margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(200, 50, 80, 0.1);
+            position: relative;
+        }
+        .photo-frame::before, .photo-frame::after {
+            content: ''; position: absolute; top: 0; bottom: 0; width: 12px;
+            background: repeating-linear-gradient(to bottom, #ffb6c1 0px, #ffb6c1 8px, transparent 8px, transparent 16px);
+        }
+        .photo-frame::before { left: -6px; }
+        .photo-frame::after { right: -6px; }
+        .photo-frame img {
+            width: 100%; display: block; border-radius: 4px;
+            max-height: 420px; object-fit: cover;
+        }
+
+        .published-box {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fff; border: 1.5px solid #333; border-radius: 20px;
+            padding: 8px 16px; margin: 16px 0 8px; font-size: 0.9em;
+        }
+        .published-label { font-style: italic; color: #333; }
+        .published-value { color: #c41e3a; font-weight: 600; }
+        .deco-line { text-align: center; margin: 12px 0; color: #c41e3a; font-size: 1.4em; letter-spacing: 4px; }
+
+        .status-bar {
+            background: #fff0f3; border-top: 1px solid #ffd0d8;
+            padding: 14px 18px; display: flex;
+            justify-content: space-between; align-items: center; font-size: 0.85em;
+        }
+        .status-left { display: flex; align-items: center; gap: 8px; }
+        .status-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #00d4aa; box-shadow: 0 0 8px #00d4aa;
+            animation: pulse 2s infinite;
+        }
+        .status-dot.paused { background: #ff9500; box-shadow: 0 0 8px #ff9500; }
+        .status-dot.expired { background: #999; box-shadow: none; animation: none; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .next-bump { color: #c41e3a; font-weight: 600; }
+
+        .loading, .error-box { text-align: center; padding: 60px 20px; color: #888; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid #ffd0d8; border-top-color: #ff2e63;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            background: #333; color: white; padding: 12px 24px;
+            border-radius: 30px; font-size: 0.9em; font-weight: 600;
+            z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
+        .toast.show { opacity: 1; }
+        .toast.success { background: #00b894; }
+        .toast.error { background: #c41e3a; }
+        .toast.warning { background: #ff9500; }
+
+        /* ==================== MODAL DE EDICIÓN ==================== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); display: none;
+            align-items: flex-start; justify-content: center;
+            z-index: 2000; padding: 15px; overflow-y: auto;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: linear-gradient(180deg, #ff9ec0 0%, #ff6b9d 30%, #ff4d8a 100%);
+            border-radius: 20px; width: 100%; max-width: 420px;
+            margin: 20px auto; box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+            position: relative; overflow: hidden;
+        }
+
+        .modal-banner {
+            text-align: center; padding: 18px 15px 10px;
+            position: relative;
+        }
+        .modal-banner .step-num {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; background: white; color: #ff2e63;
+            border-radius: 50%; font-weight: 800; font-size: 1.2em;
+            margin-right: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .modal-banner .step-title {
+            font-size: 1.4em; font-weight: 700; color: white;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .modal-body {
+            background: #fff5f8; margin: 0 12px 12px;
+            border-radius: 16px; padding: 18px 16px 20px;
+        }
+
+        .form-row {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 12px; margin-bottom: 14px;
+        }
+        .form-group { margin-bottom: 14px; }
+        .form-group.full { grid-column: 1 / -1; }
+
+        .form-group label {
+            display: block; font-size: 0.85em; font-weight: 700;
+            color: #c41e3a; margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%; padding: 11px 12px;
+            border: 1.5px solid #ffb6c1; border-radius: 10px;
+            background: white; font-size: 0.95em;
+            font-family: inherit; color: #333;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none; border-color: #ff2e63;
+            box-shadow: 0 0 0 3px rgba(255,46,99,0.15);
+        }
+        .form-group textarea { min-height: 110px; resize: vertical; }
+
+        /* Campos bloqueados */
+        .form-group.locked input,
+        .form-group.locked select {
+            background: #f0f0f0; color: #888; cursor: not-allowed;
+            border-color: #ddd;
+        }
+        .locked-badge {
+            display: inline-block; background: #ff6b6b; color: white;
+            font-size: 0.7em; padding: 2px 8px; border-radius: 10px;
+            margin-left: 6px; vertical-align: middle;
+        }
+
+        /* Fotos bloqueadas */
+        .photos-locked {
+            background: #f8f8f8; border: 2px dashed #ccc;
+            border-radius: 12px; padding: 15px; text-align: center;
+            position: relative;
+        }
+        .photos-locked-overlay {
+            position: absolute; inset: 0;
+            background: rgba(255,255,255,0.7);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #c41e3a; font-size: 0.95em;
+            z-index: 2;
+        }
+        .photos-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 8px; opacity: 0.5;
+        }
+        .photos-grid img {
+            width: 100%; aspect-ratio: 1; object-fit: cover;
+            border-radius: 8px; border: 2px solid #ddd;
+        }
+
+        .modal-actions {
+            display: flex; gap: 10px; margin-top: 18px;
+        }
+        .modal-actions .btn {
+            flex: 1; text-transform: none; font-size: 1em;
+        }
+        .btn-next {
+            background: linear-gradient(135deg, #ff6b9d, #ff2e63);
+            color: white;
+        }
+        .btn-back {
+            background: #ddd; color: #555;
+        }
+        .btn-publish {
+            background: linear-gradient(135deg, #ff6b9d, #ff2e63);
+            color: white;
+        }
+
+        /* Captcha step */
+        .captcha-box {
+            text-align: center; padding: 10px 0;
+        }
+        .captcha-box img {
+            max-width: 100%; border-radius: 10px;
+            border: 2px solid #ffb6c1; margin-bottom: 15px;
+        }
+        .captcha-input {
+            width: 100%; padding: 14px; font-size: 1.3em;
+            text-align: center; letter-spacing: 4px;
+            text-transform: uppercase; border: 2px solid #ff2e63;
+            border-radius: 12px; margin-bottom: 15px;
+        }
+
+        .steps-indicator {
+            display: flex; justify-content: center; gap: 8px;
+            margin-bottom: 15px;
+        }
+        .step-dot {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: rgba(255,255,255,0.4); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8em; font-weight: 700;
+        }
+        .step-dot.active { background: white; color: #ff2e63; }
+        .step-dot.done { background: #00d4aa; color: white; }
+
+        .modal-close {
+            position: absolute; top: 12px; right: 14px;
+            background: rgba(255,255,255,0.3); border: none;
+            color: white; width: 32px; height: 32px;
+            border-radius: 50%; font-size: 1.2em; cursor: pointer;
+            z-index: 5;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.5); }
+
+        @media (max-width: 400px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Cargando tu anuncio...</p>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDICIÓN -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+
+            <!-- PASO 1: Formulario -->
+            <div id="editStep1">
+                <div class="modal-banner">
+                    <div class="steps-indicator">
+                        <div class="step-dot active">1</div>
+                        <div class="step-dot">2</div>
+                        <div class="step-dot">3</div>
+                    </div>
+                    <span class="step-num">1</span>
+                    <span class="step-title">Edit Post</span>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Name / Alias</label>
+                            <input type="text" id="editName" placeholder="Ej: Maria">
+                        </div>
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" id="editAge" min="18" max="99" placeholder="25">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Headline (Título)</label>
+                        <input type="text" id="editHeadline" placeholder="Título del anuncio">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Body (Descripción)</label>
+                        <textarea id="editBody" placeholder="Descripción del anuncio..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="editCity" placeholder="Ciudad">
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <select id="editState">
+                                <option value="">Selecciona...</option>
+                                <option value="Alabama">Alabama</option>
+                                <option value="Alaska">Alaska</option>
+                                <option value="Arizona">Arizona</option>
+                                <option value="Arkansas">Arkansas</option>
+                                <option value="California">California</option>
+                                <option value="Colorado">Colorado</option>
+                                <option value="Connecticut">Connecticut</option>
+                                <option value="Delaware">Delaware</option>
+                                <option value="Florida">Florida</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Hawaii">Hawaii</option>
+                                <option value="Idaho">Idaho</option>
+                                <option value="Illinois">Illinois</option>
+                                <option value="Indiana">Indiana</option>
+                                <option value="Iowa">Iowa</option>
+                                <option value="Kansas">Kansas</option>
+                                <option value="Kentucky">Kentucky</option>
+                                <option value="Louisiana">Louisiana</option>
+                                <option value="Maine">Maine</option>
+                                <option value="Maryland">Maryland</option>
+                                <option value="Massachusetts">Massachusetts</option>
+                                <option value="Michigan">Michigan</option>
+                                <option value="Minnesota">Minnesota</option>
+                                <option value="Mississippi">Mississippi</option>
+                                <option value="Missouri">Missouri</option>
+                                <option value="Montana">Montana</option>
+                                <option value="Nebraska">Nebraska</option>
+                                <option value="Nevada">Nevada</option>
+                                <option value="New Hampshire">New Hampshire</option>
+                                <option value="New Jersey">New Jersey</option>
+                                <option value="New Mexico">New Mexico</option>
+                                <option value="New York">New York</option>
+                                <option value="North Carolina">North Carolina</option>
+                                <option value="North Dakota">North Dakota</option>
+                                <option value="Ohio">Ohio</option>
+                                <option value="Oklahoma">Oklahoma</option>
+                                <option value="Oregon">Oregon</option>
+                                <option value="Pennsylvania">Pennsylvania</option>
+                                <option value="Rhode Island">Rhode Island</option>
+                                <option value="South Carolina">South Carolina</option>
+                                <option value="South Dakota">South Dakota</option>
+                                <option value="Tennessee">Tennessee</option>
+                                <option value="Texas">Texas</option>
+                                <option value="Utah">Utah</option>
+                                <option value="Vermont">Vermont</option>
+                                <option value="Virginia">Virginia</option>
+                                <option value="Washington">Washington</option>
+                                <option value="West Virginia">West Virginia</option>
+                                <option value="Wisconsin">Wisconsin</option>
+                                <option value="Wyoming">Wyoming</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Location / Area</label>
+                        <input type="text" id="editArea" placeholder="Área o barrio">
+                    </div>
+
+                    <!-- Teléfono BLOQUEADO -->
+                    <div class="form-group locked">
+                        <label>Phone <span class="locked-badge">🔒 Bloqueado</span></label>
+                        <input type="text" id="editPhone" disabled>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn btn-back" onclick="closeEditModal()">Cancelar</button>
+                        <button class="btn btn-next" onclick="goToStep2()">Next →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 2: Fotos (bloqueadas) -->
+            <div id="editStep2" style="display:none;">
+                <div class="modal-banner">
+                    <div class="steps-indicator">
+                        <div class="step-dot done">✓</div>
+                        <div class="step-dot active">2</div>
+                        <div class="step-dot">3</div>
+                    </div>
+                    <span class="step-num">2</span>
+                    <span class="step-title">Add Pics & Video</span>
+                </div>
+                <div class="modal-body">
+                    <p style="text-align:center; color:#c41e3a; font-weight:600; margin-bottom:12px;">
+                        📷 Fotos actuales (no se pueden cambiar)
+                    </p>
+
+                    <div class="photos-locked">
+                        <div class="photos-locked-overlay">
+                            🔒 Fotos bloqueadas temporalmente
+                        </div>
+                        <div class="photos-grid" id="editPhotosGrid">
+                            <!-- se llenan por JS -->
+                        </div>
+                    </div>
+
+                    <p style="text-align:center; color:#888; font-size:0.85em; margin-top:12px;">
+                        El número de teléfono y las fotos no se pueden modificar desde aquí.
+                    </p>
+
+                    <div class="modal-actions">
+                        <button class="btn btn-back" onclick="goToStep1()">← Back</button>
+                        <button class="btn btn-publish" onclick="submitEdit()">Continuar →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 3: Captcha / Resultado -->
+            <div id="editStep3" style="display:none;">
+                <div class="modal-banner">
+                    <div class="steps-indicator">
+                        <div class="step-dot done">✓</div>
+                        <div class="step-dot done">✓</div>
+                        <div class="step-dot active">3</div>
+                    </div>
+                    <span class="step-num">3</span>
+                    <span class="step-title" id="step3Title">Captcha</span>
+                </div>
+                <div class="modal-body">
+                    <!-- Esperando captcha -->
+                    <div id="captchaWaiting" style="text-align:center; padding:30px 10px;">
+                        <div class="spinner"></div>
+                        <p style="margin-top:15px; color:#c41e3a; font-weight:600;">
+                            Esperando captcha de la extensión...
+                        </p>
+                        <p style="color:#888; font-size:0.85em; margin-top:8px;">
+                            El bot está preparando el código. Espera un momento.
+                        </p>
+                    </div>
+
+                    <!-- Captcha listo -->
+                    <div id="captchaReady" style="display:none;" class="captcha-box">
+                        <p style="font-weight:600; color:#c41e3a; margin-bottom:10px;">
+                            Escribe el código que aparece en la imagen:
+                        </p>
+                        <img id="captchaImage" src="" alt="Captcha">
+                        <input type="text" class="captcha-input" id="captchaInput"
+                               placeholder="CÓDIGO" maxlength="10" autocomplete="off">
+                        <button class="btn btn-publish" style="width:100%;" onclick="sendCaptcha()">
+                            Enviar Código
+                        </button>
+                    </div>
+
+                    <!-- Resultado -->
+                    <div id="editResult" style="display:none; text-align:center; padding:20px 10px;">
+                        <div id="resultIcon" style="font-size:50px; margin-bottom:10px;"></div>
+                        <h3 id="resultTitle" style="margin-bottom:10px;"></h3>
+                        <p id="resultMsg" style="color:#666;"></p>
+                        <button class="btn btn-next" style="margin-top:20px; width:100%;" onclick="closeEditModal()">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const FIREBASE_URL = 'https://ezequielredd-default-rtdb.firebaseio.com';
+        const BUMP_INTERVAL = 16;
+
+        function getAdId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id') || params.get('client');
+        }
+
+        const AD_ID = getAdId();
+
+        if (!AD_ID) {
+            document.getElementById('app').innerHTML = `
+                <div class="error-box">
+                    <div style="font-size:50px;margin-bottom:15px;">⚠️</div>
+                    <h3>Link inválido</h3>
+                    <p style="margin-top:10px;color:#888;">No se encontró el ID del anuncio.</p>
+                </div>`;
+            throw new Error('No AD_ID');
+        }
+
+        let currentData = null;
+        let isManualPublishing = false;
+        let captchaCheckInterval = null;
+
+        // ========== UTILIDADES ==========
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast show ${type}`;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function formatTime(ms) {
+            if (ms <= 0) return '00:00';
+            const m = Math.floor(ms / 60000);
+            const s = Math.floor((ms % 60000) / 1000);
+            return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        function formatRemaining(ms) {
+            const d = Math.floor(ms / 86400000);
+            const h = Math.floor((ms % 86400000) / 3600000);
+            const m = Math.floor((ms % 3600000) / 60000);
+            if (d > 0) return `${d}d ${h}h ${m}m`;
+            if (h > 0) return `${h}h ${m}m`;
+            return `${m}m`;
+        }
+
+        function getRemaining(ad) {
+            if (!ad.startTime || !ad.duration) return { text: '--', expired: true };
+            const totalPaused = ad.totalPausedTime || 0;
+            const end = ad.startTime + (ad.duration * 60 * 1000) + totalPaused;
+            if (ad.timePaused && ad.pausedAt) {
+                const left = Math.max(0, end - ad.pausedAt);
+                return { text: formatRemaining(left) + ' ⏸️', expired: false, paused: true };
+            }
+            const left = end - Date.now();
+            if (left <= 0) return { text: 'Expirado', expired: true };
+            return { text: formatRemaining(left), expired: false };
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const d = document.createElement('div');
+            d.textContent = text;
+            return d.innerHTML;
+        }
+
+        // ========== RENDER PRINCIPAL ==========
+        function render(ad) {
+            const remaining = getRemaining(ad);
+            const isActive = ad.active !== false && !remaining.expired && !ad.timePaused;
+            const isPaused = ad.active === false || ad.timePaused;
+            const isExpired = remaining.expired;
+            const nextBumpMs = Math.max(0, (ad.nextBumpTime || 0) - Date.now());
+            const nextBumpStr = isExpired || isPaused ? '--:--' : formatTime(nextBumpMs);
+
+            let statusClass = 'status-dot';
+            let statusText = 'Activo';
+            if (isExpired) { statusClass += ' expired'; statusText = 'Finalizado'; }
+            else if (isPaused) { statusClass += ' paused'; statusText = 'Pausado'; }
+
+            let photosHtml = '';
+            if (ad.photos && ad.photos.length > 0) {
+                photosHtml = ad.photos.map(src => `
+                    <div class="photo-frame">
+                        <img src="${src}" alt="Foto" loading="lazy"
+                             onerror="this.parentElement.style.display='none'">
+                    </div>`).join('');
+            } else {
+                photosHtml = `
+                    <div style="text-align:center;padding:30px;color:#aaa;border:2px dashed #ffd0d8;border-radius:12px;">
+                        📷 Las fotos aparecerán cuando la extensión las detecte
+                    </div>`;
+            }
+
+            const publishedHtml = ad.lastPublished ? `
+                <div class="published-box">
+                    <span class="published-label">Post published:</span>
+                    <span class="published-value">${escapeHtml(ad.lastPublished)}</span>
+                </div>` : '';
+
+            let pauseResumeBtn = '';
+            if (isExpired) {
+                pauseResumeBtn = `<button class="btn" disabled style="grid-column:1/-1;background:#ccc;">Servicio Finalizado</button>`;
+            } else if (isPaused) {
+                pauseResumeBtn = `<button class="btn btn-resume" onclick="resumeService()">▶️ Reanudar Automático</button>`;
+            } else {
+                pauseResumeBtn = `<button class="btn btn-pause" onclick="pauseService()">⏸️ Pausar Automático</button>`;
+            }
+
+            document.getElementById('app').innerHTML = `
+                <div class="header">
+                    <div class="logo-area">
+                        <div class="logo-icon">💋</div>
+                        <div class="logo-text">Manage Posts</div>
+                        <div class="logo-sub">Control de tu anuncio</div>
+                    </div>
+                </div>
+
+                <div class="main-buttons">
+                    <button class="btn btn-edit" onclick="openEditModal()" ${isExpired ? 'disabled' : ''}>
+                        ✏️ Edit Post
+                    </button>
+                    ${pauseResumeBtn}
+                    <button class="btn btn-manual" onclick="manualPublish()" id="btnManual" ${isExpired ? 'disabled' : ''}>
+                        🚀 Publicar Ahora
+                    </button>
+                </div>
+
+                <div class="current-post">
+                    <div class="section-title">CURRENT POST</div>
+                    ${ad.headline ? `<div class="ad-headline">${escapeHtml(ad.headline)}</div>` : ''}
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Phone :</span>
+                            <span class="info-value">${ad.phone || '—'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Age :</span>
+                            <span class="info-value">${ad.age || '—'}</span>
+                        </div>
+                        <div class="info-item info-full">
+                            <span class="info-label">City :</span>
+                            <span class="info-value">${ad.city || '—'}</span>
+                        </div>
+                        ${ad.area ? `<div class="info-item info-full">
+                            <span class="info-label">Area :</span>
+                            <span class="info-value">${escapeHtml(ad.area)}</span>
+                        </div>` : ''}
+                        ${ad.adState ? `<div class="info-item info-full">
+                            <span class="info-label">State :</span>
+                            <span class="info-value">${escapeHtml(ad.adState)}</span>
+                        </div>` : ''}
+                    </div>
+                    ${ad.body ? `<div class="ad-body">${escapeHtml(ad.body)}</div>` : ''}
+                    <div class="photos-section">${photosHtml}</div>
+                    ${publishedHtml}
+                    <div class="deco-line">❖❖❖</div>
+                </div>
+
+                <div class="status-bar">
+                    <div class="status-left">
+                        <div class="${statusClass}"></div>
+                        <span>${statusText}</span>
+                    </div>
+                    <div>
+                        <span style="color:#888;">Próximo auto:</span>
+                        <span class="next-bump">${nextBumpStr}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== ACCIONES SERVICIO ==========
+        async function pauseService() {
+            try {
+                await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ active: false, timePaused: true, pausedAt: Date.now() })
+                });
+                showToast('⏸️ Automático pausado', 'warning');
+                loadData();
+            } catch (e) { showToast('Error al pausar', 'error'); }
+        }
+
+        async function resumeService() {
+            try {
+                const res = await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`);
+                const ad = await res.json();
+                const now = Date.now();
+                const pausedTime = ad.pausedAt ? (now - ad.pausedAt) : 0;
+                const totalPausedTime = (ad.totalPausedTime || 0) + pausedTime;
+
+                await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        active: true, timePaused: false, pausedAt: null,
+                        totalPausedTime, nextBumpTime: now + (BUMP_INTERVAL * 60 * 1000)
+                    })
+                });
+                showToast('▶️ Automático reanudado', 'success');
+                loadData();
+            } catch (e) { showToast('Error al reanudar', 'error'); }
+        }
+
+        async function manualPublish() {
+            if (isManualPublishing) return;
+            isManualPublishing = true;
+            const btn = document.getElementById('btnManual');
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ Publicando...'; }
+
+            try {
+                await fetch(`${FIREBASE_URL}/manualBump/${AD_ID}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ requestedAt: Date.now(), status: 'pending' })
+                });
+                await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nextBumpTime: Date.now() - 1000, forceBump: true })
+                });
+                showToast('🚀 Orden de publicación enviada', 'success');
+                setTimeout(() => { isManualPublishing = false; loadData(); }, 4000);
+            } catch (e) {
+                showToast('Error al publicar', 'error');
+                isManualPublishing = false;
+                if (btn) { btn.disabled = false; btn.textContent = '🚀 Publicar Ahora'; }
+            }
+        }
+
+        // ========== EDICIÓN ==========
+        function openEditModal() {
+            if (!currentData) return;
+
+            // Rellenar formulario con datos actuales
+            document.getElementById('editName').value = currentData.adName || currentData.name || '';
+            document.getElementById('editAge').value = currentData.age || '';
+            document.getElementById('editHeadline').value = currentData.headline || currentData.adHeadline || '';
+            document.getElementById('editBody').value = currentData.body || currentData.adBody || '';
+            document.getElementById('editCity').value = (currentData.city || '').split(',')[0].trim();
+            document.getElementById('editArea').value = currentData.area || '';
+            document.getElementById('editPhone').value = currentData.phone || '';
+
+            // Estado
+            const stateSelect = document.getElementById('editState');
+            const stateVal = currentData.adState || '';
+            for (let i = 0; i < stateSelect.options.length; i++) {
+                if (stateSelect.options[i].value === stateVal ||
+                    stateSelect.options[i].text === stateVal) {
+                    stateSelect.selectedIndex = i;
+                    break;
+                }
+            }
+
+            // Fotos en paso 2
+            const grid = document.getElementById('editPhotosGrid');
+            if (currentData.photos && currentData.photos.length) {
+                grid.innerHTML = currentData.photos.slice(0, 8).map(src =>
+                    `<img src="${src}" onerror="this.style.display='none'">`
+                ).join('');
+            } else {
+                grid.innerHTML = '<div style="grid-column:1/-1;color:#aaa;padding:20px;">Sin fotos detectadas</div>';
+            }
+
+            // Reset steps
+            document.getElementById('editStep1').style.display = 'block';
+            document.getElementById('editStep2').style.display = 'none';
+            document.getElementById('editStep3').style.display = 'none';
+            document.getElementById('captchaWaiting').style.display = 'block';
+            document.getElementById('captchaReady').style.display = 'none';
+            document.getElementById('editResult').style.display = 'none';
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            if (captchaCheckInterval) {
+                clearInterval(captchaCheckInterval);
+                captchaCheckInterval = null;
+            }
+        }
+
+        function goToStep1() {
+            document.getElementById('editStep1').style.display = 'block';
+            document.getElementById('editStep2').style.display = 'none';
+            document.getElementById('editStep3').style.display = 'none';
+        }
+
+        function goToStep2() {
+            document.getElementById('editStep1').style.display = 'none';
+            document.getElementById('editStep2').style.display = 'block';
+            document.getElementById('editStep3').style.display = 'none';
+        }
+
+        async function submitEdit() {
+            // Recoger datos del formulario (sin teléfono ni fotos)
+            const editData = {
+                adName: document.getElementById('editName').value.trim(),
+                age: parseInt(document.getElementById('editAge').value) || null,
+                adHeadline: document.getElementById('editHeadline').value.trim(),
+                adBody: document.getElementById('editBody').value.trim(),
+                city: document.getElementById('editCity').value.trim(),
+                adState: document.getElementById('editState').value,
+                area: document.getElementById('editArea').value.trim(),
+                // NO enviamos phone ni photos
+                status: 'pending',
+                requestedAt: Date.now()
+            };
+
+            try {
+                // Marcar anuncio como editando
+                await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ editStatus: 'editing' })
+                });
+
+                // Crear solicitud de edición
+                await fetch(`${FIREBASE_URL}/editRequests/${AD_ID}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(editData)
+                });
+
+                // Ir a paso 3 (captcha)
+                document.getElementById('editStep2').style.display = 'none';
+                document.getElementById('editStep3').style.display = 'block';
+                document.getElementById('captchaWaiting').style.display = 'block';
+                document.getElementById('captchaReady').style.display = 'none';
+                document.getElementById('editResult').style.display = 'none';
+
+                // Empezar a escuchar el captcha
+                startCaptchaListener();
+
+            } catch (e) {
+                showToast('Error al enviar edición', 'error');
+                console.error(e);
+            }
+        }
+
+        function startCaptchaListener() {
+            if (captchaCheckInterval) clearInterval(captchaCheckInterval);
+
+            let checks = 0;
+            captchaCheckInterval = setInterval(async () => {
+                checks++;
+                try {
+                    const res = await fetch(`${FIREBASE_URL}/editRequests/${AD_ID}.json`);
+                    const data = await res.json();
+                    if (!data) return;
+
+                    // Captcha listo
+                    if (data.captchaImage && data.status === 'waiting_captcha') {
+                        document.getElementById('captchaWaiting').style.display = 'none';
+                        document.getElementById('captchaReady').style.display = 'block';
+                        document.getElementById('captchaImage').src = data.captchaImage;
+                        document.getElementById('captchaInput').value = '';
+                        document.getElementById('captchaInput').focus();
+                        return;
+                    }
+
+                    // Error de captcha
+                    if (data.status === 'error_captcha') {
+                        document.getElementById('captchaWaiting').style.display = 'none';
+                        document.getElementById('captchaReady').style.display = 'block';
+                        document.getElementById('captchaImage').src = data.captchaImage || '';
+                        showToast(data.errorMessage || 'Código incorrecto', 'error');
+                        return;
+                    }
+
+                    // Completado
+                    if (data.status === 'completed') {
+                        clearInterval(captchaCheckInterval);
+                        captchaCheckInterval = null;
+                        showEditResult(true, '¡Anuncio actualizado correctamente!');
+                        loadData();
+                        return;
+                    }
+
+                    // Error general
+                    if (data.status === 'error') {
+                        clearInterval(captchaCheckInterval);
+                        captchaCheckInterval = null;
+                        showEditResult(false, data.errorMessage || 'Error en la edición');
+                        return;
+                    }
+
+                    // Timeout ~3 min
+                    if (checks > 90) {
+                        clearInterval(captchaCheckInterval);
+                        captchaCheckInterval = null;
+                        showEditResult(false, 'Tiempo agotado. Intenta de nuevo.');
+                    }
+                } catch (e) {
+                    console.error('Error checking captcha:', e);
+                }
+            }, 2000);
+        }
+
+        async function sendCaptcha() {
+            const code = document.getElementById('captchaInput').value.trim();
+            if (!code) {
+                showToast('Escribe el código', 'warning');
+                return;
+            }
+
+            try {
+                await fetch(`${FIREBASE_URL}/editRequests/${AD_ID}.json`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        captchaCode: code,
+                        status: 'captcha_submitted',
+                        submittedAt: Date.now()
+                    })
+                });
+
+                document.getElementById('captchaReady').style.display = 'none';
+                document.getElementById('captchaWaiting').style.display = 'block';
+                document.querySelector('#captchaWaiting p').textContent = 'Enviando código... espera un momento';
+                showToast('Código enviado', 'success');
+            } catch (e) {
+                showToast('Error al enviar código', 'error');
+            }
+        }
+
+        function showEditResult(success, message) {
+            document.getElementById('captchaWaiting').style.display = 'none';
+            document.getElementById('captchaReady').style.display = 'none';
+            document.getElementById('editResult').style.display = 'block';
+            document.getElementById('resultIcon').textContent = success ? '✅' : '❌';
+            document.getElementById('resultTitle').textContent = success ? '¡Completado!' : 'Error';
+            document.getElementById('resultTitle').style.color = success ? '#00b894' : '#c41e3a';
+            document.getElementById('resultMsg').textContent = message;
+        }
+
+        // ========== CARGA ==========
+        async function loadData() {
+            try {
+                const res = await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`);
+                const ad = await res.json();
+                if (!ad) {
+                    document.getElementById('app').innerHTML = `
+                        <div class="error-box">
+                            <div style="font-size:50px;margin-bottom:15px;">📭</div>
+                            <h3>Anuncio no encontrado</h3>
+                            <p style="margin-top:10px;color:#888;">Verifica el link con el administrador.</p>
+                        </div>`;
+                    return;
+                }
+                currentData = ad;
+                render(ad);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('app').innerHTML = `
+                    <div class="error-box">
+                        <div style="font-size:50px;margin-bottom:15px;">⚠️</div>
+                        <h3>Error de conexión</h3>
+                    </div>`;
+            }
+        }
+
+        loadData();
+        setInterval(loadData, 5000);
+    </script>
+</body>
+</html>
