@@ -654,13 +654,16 @@
 
             let photosHtml = '';
             if (ad.photos && ad.photos.length > 0) {
-                photosHtml = ad.photos.map(src => `
+                photosHtml = ad.photos.map(src => {
+                    // Proxy para evitar bloqueo del CDN fuera de megapersonals.eu
+                    const proxied = 'https://wsrv.nl/?url=' + encodeURIComponent(src) + '&output=webp';
+                    return `
                     <div class="photo-frame">
-                        <img src="${src}" alt="Foto" loading="lazy"
+                        <img src="${proxied}" alt="Foto" loading="lazy"
                              referrerpolicy="no-referrer"
-                             crossorigin="anonymous"
-                             onerror="console.warn('Foto no cargó:', this.src); this.style.opacity='0.3'; this.alt='No se pudo cargar';">
-                    </div>`).join('');
+                             onerror="this.onerror=null; this.src='${src}';">
+                    </div>`;
+                }).join('');
             } else {
                 photosHtml = `
                     <div style="text-align:center;padding:30px;color:#aaa;border:2px dashed #ffd0d8;border-radius:12px;">
