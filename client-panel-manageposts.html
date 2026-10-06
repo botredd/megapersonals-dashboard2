@@ -657,7 +657,9 @@
                 photosHtml = ad.photos.map(src => `
                     <div class="photo-frame">
                         <img src="${src}" alt="Foto" loading="lazy"
-                             onerror="this.parentElement.style.display='none'">
+                             referrerpolicy="no-referrer"
+                             crossorigin="anonymous"
+                             onerror="console.warn('Foto no cargó:', this.src); this.style.opacity='0.3'; this.alt='No se pudo cargar';">
                     </div>`).join('');
             } else {
                 photosHtml = `
@@ -1027,11 +1029,14 @@
                     .filter(([id, ad]) => ad && ad.clientId === CLIENT_PERSON_ID)
                     .map(([id, ad]) => ({ id, ...ad }));
 
-                // Preferir anuncio activo
-                const active = allAds.find(a => a.active !== false) || allAds[0];
-                if (active) {
-                    AD_ID = active.id;
-                    currentData = active;
+                // Preferir: 1) el que tenga fotos, 2) el activo, 3) el primero
+                const withPhotos = allAds.find(a => a.photos && a.photos.length > 0);
+                const active = allAds.find(a => a.active !== false);
+                const chosen = withPhotos || active || allAds[0];
+                if (chosen) {
+                    AD_ID = chosen.id;
+                    currentData = chosen;
+                    console.log('📌 Anuncio seleccionado:', AD_ID, 'fotos:', (chosen.photos || []).length);
                 }
                 return;
             }
