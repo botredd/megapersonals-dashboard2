@@ -567,23 +567,29 @@
         const FIREBASE_URL = 'https://ezequielredd-default-rtdb.firebaseio.com';
         const BUMP_INTERVAL = 16;
 
-        function getAdId() {
+        function getUrlParam() {
             const params = new URLSearchParams(window.location.search);
             return params.get('id') || params.get('client');
         }
 
-        const AD_ID = getAdId();
+        const URL_PARAM = getUrlParam();
 
-        if (!AD_ID) {
+        if (!URL_PARAM) {
             document.getElementById('app').innerHTML = `
                 <div class="error-box">
                     <div style="font-size:50px;margin-bottom:15px;">⚠️</div>
                     <h3>Link inválido</h3>
-                    <p style="margin-top:10px;color:#888;">No se encontró el ID del anuncio.</p>
+                    <p style="margin-top:10px;color:#888;">No se encontró el ID del cliente.</p>
                 </div>`;
-            throw new Error('No AD_ID');
+            throw new Error('No URL_PARAM');
         }
 
+        // AD_ID = ID del anuncio activo en Firebase (clients/{AD_ID})
+        // CLIENT_PERSON_ID = ID del cliente (person_...) cuando el link viene del admin
+        let AD_ID = null;
+        let CLIENT_PERSON_ID = null;
+        let allAds = [];
+        let clientInfo = null;
         let currentData = null;
         let isManualPublishing = false;
         let captchaCheckInterval = null;
@@ -1006,11 +1012,55 @@
         }
 
         // ========== CARGA ==========
+        async function resolveIds() {
+            // 1) ¿Es un cliente (person_...)?
+            const infoRes = await fetch(`${FIREBASE_URL}/clientsInfo/${URL_PARAM}.json`);
+            const info = await infoRes.json();
+
+            if (info) {
+                CLIENT_PERSON_ID = URL_PARAM;
+                clientInfo = info;
+
+                const adsRes = await fetch(`${FIREBASE_URL}/clients.json`);
+                const all = await adsRes.json() || {};
+                allAds = Object.entries(all)
+                    .filter(([id, ad]) => ad && ad.clientId === CLIENT_PERSON_ID)
+                    .map(([id, ad]) => ({ id, ...ad }));
+
+                // Preferir anuncio activo
+                const active = allAds.find(a => a.active !== false) || allAds[0];
+                if (active) {
+                    AD_ID = active.id;
+                    currentData = active;
+                }
+                return;
+            }
+
+            // 2) ¿Es un anuncio directo (client_...)?
+            const adRes = await fetch(`${FIREBASE_URL}/clients/${URL_PARAM}.json`);
+            const ad = await adRes.json();
+            if (ad) {
+                AD_ID = URL_PARAM;
+                currentData = { id: URL_PARAM, ...ad };
+                allAds = [currentData];
+                if (ad.clientId) {
+                    CLIENT_PERSON_ID = ad.clientId;
+                    const ci = await fetch(`${FIREBASE_URL}/clientsInfo/${ad.clientId}.json`).then(r => r.json());
+                    clientInfo = ci;
+                }
+                return;
+            }
+
+            // No encontrado
+            AD_ID = null;
+            currentData = null;
+        }
+
         async function loadData() {
             try {
-                const res = await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`);
-                const ad = await res.json();
-                if (!ad) {
+                await resolveIds();
+
+                if (!currentData || !AD_ID) {
                     document.getElementById('app').innerHTML = `
                         <div class="error-box">
                             <div style="font-size:50px;margin-bottom:15px;">📭</div>
@@ -1019,8 +1069,14 @@
                         </div>`;
                     return;
                 }
-                currentData = ad;
-                render(ad);
+
+                // Refrescar datos del anuncio activo
+                const res = await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`);
+                const ad = await res.json();
+                if (ad) {
+                    currentData = { id: AD_ID, ...ad };
+                }
+                render(currentData);
             } catch (e) {
                 console.error(e);
                 document.getElementById('app').innerHTML = `
