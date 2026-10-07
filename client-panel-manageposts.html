@@ -852,11 +852,33 @@
             document.getElementById('editModal').classList.add('active');
         }
 
-        function closeEditModal() {
+        async function closeEditModal() {
             document.getElementById('editModal').classList.remove('active');
             if (captchaCheckInterval) {
                 clearInterval(captchaCheckInterval);
                 captchaCheckInterval = null;
+            }
+            // Cancelar edición en Firebase para que la extensión deje de editar
+            try {
+                if (AD_ID) {
+                    await fetch(`${FIREBASE_URL}/editRequests/${AD_ID}.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            status: 'cancelled',
+                            cancelledAt: Date.now()
+                        })
+                    });
+                    await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ editStatus: null })
+                    });
+                    console.log('🚫 Edición cancelada');
+                    showToast('Edición cancelada', 'warning');
+                }
+            } catch (e) {
+                console.error('Error cancelando edición:', e);
             }
         }
 
@@ -936,17 +958,22 @@
                     if (data.captchaImage && data.status === 'waiting_captcha') {
                         document.getElementById('captchaWaiting').style.display = 'none';
                         document.getElementById('captchaReady').style.display = 'block';
-                        document.getElementById('captchaImage').src = data.captchaImage;
-                        document.getElementById('captchaInput').value = '';
-                        document.getElementById('captchaInput').focus();
+                        const imgEl = document.getElementById('captchaImage');
+                        // Solo actualizar imagen si cambió (NO borrar lo que escribe el cliente)
+                        if (imgEl.src !== data.captchaImage && !imgEl.src.endsWith(data.captchaImage)) {
+                            imgEl.src = data.captchaImage;
+                        }
                         return;
                     }
 
-                    // Error de captcha
+                    // Error de captcha → nueva imagen, ahí sí limpiar input
                     if (data.status === 'error_captcha') {
                         document.getElementById('captchaWaiting').style.display = 'none';
                         document.getElementById('captchaReady').style.display = 'block';
-                        document.getElementById('captchaImage').src = data.captchaImage || '';
+                        if (data.captchaImage) {
+                            document.getElementById('captchaImage').src = data.captchaImage;
+                        }
+                        document.getElementById('captchaInput').value = '';
                         showToast(data.errorMessage || 'Código incorrecto', 'error');
                         return;
                     }
@@ -993,7 +1020,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         captchaCode: code,
-                        status: 'captcha_submitted',
+                        status: 'captcha_received',
                         submittedAt: Date.now()
                     })
                 });
@@ -1097,7 +1124,13 @@
         }
 
         loadData();
-        setInterval(loadData, 5000);
+        setInterval(() => {
+            // No refrescar el panel principal si el modal de edición está abierto
+            // (evita que se pierda el código del captcha)
+            const modal = document.getElementById('editModal');
+            if (modal && modal.classList.contains('active')) return;
+            loadData();
+        }, 5000);
     </script>
 </body>
 </html>
