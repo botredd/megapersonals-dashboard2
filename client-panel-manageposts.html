@@ -810,7 +810,9 @@
             if (!currentData) return;
 
             // Rellenar formulario con datos actuales
-            document.getElementById('editName').value = currentData.adName || currentData.name || '';
+            // No usar "Anuncio" (nombre por defecto del admin)
+            const rawName = currentData.adName || currentData.name || '';
+            document.getElementById('editName').value = (rawName && rawName !== 'Anuncio') ? rawName : '';
             document.getElementById('editAge').value = currentData.age || '';
             document.getElementById('editHeadline').value = currentData.headline || currentData.adHeadline || '';
             document.getElementById('editBody').value = currentData.body || currentData.adBody || '';
@@ -872,18 +874,21 @@
 
         async function submitEdit() {
             // Recoger datos del formulario (sin teléfono ni fotos)
+            const nameVal = document.getElementById('editName').value.trim();
             const editData = {
-                adName: document.getElementById('editName').value.trim(),
                 age: parseInt(document.getElementById('editAge').value) || null,
                 adHeadline: document.getElementById('editHeadline').value.trim(),
                 adBody: document.getElementById('editBody').value.trim(),
                 city: document.getElementById('editCity').value.trim(),
                 adState: document.getElementById('editState').value,
                 area: document.getElementById('editArea').value.trim(),
-                // NO enviamos phone ni photos
                 status: 'pending',
                 requestedAt: Date.now()
             };
+            // Solo enviar nombre si el cliente escribió uno real (no vacío ni "Anuncio")
+            if (nameVal && nameVal !== 'Anuncio') {
+                editData.adName = nameVal;
+            }
 
             try {
                 // Marcar anuncio como editando
