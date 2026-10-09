@@ -978,6 +978,31 @@
                         return;
                     }
 
+                    // Esperando al próximo bump para publicar
+                    if (data.status === 'waiting_to_publish') {
+                        document.getElementById('captchaWaiting').style.display = 'block';
+                        document.getElementById('captchaReady').style.display = 'none';
+                        const publishAt = data.publishAt || 0;
+                        const left = Math.max(0, publishAt - Date.now());
+                        const m = Math.floor(left / 60000);
+                        const s = Math.floor((left % 60000) / 1000);
+                        const timeStr = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+                        const waitEl = document.getElementById('captchaWaiting');
+                        waitEl.innerHTML = `
+                            <div class="spinner"></div>
+                            <p style="margin-top:15px; color:#c41e3a; font-weight:600;">
+                                Código enviado ✓
+                            </p>
+                            <p style="color:#333; font-size:1.1em; font-weight:700; margin-top:10px;">
+                                Se publicará en: <span style="color:#c41e3a;">${timeStr}</span>
+                            </p>
+                            <p style="color:#888; font-size:0.85em; margin-top:8px;">
+                                La edición se publica en el próximo bump automático.
+                            </p>
+                        `;
+                        return;
+                    }
+
                     // Completado
                     if (data.status === 'completed') {
                         clearInterval(captchaCheckInterval);
@@ -995,8 +1020,8 @@
                         return;
                     }
 
-                    // Timeout ~3 min
-                    if (checks > 90) {
+                    // Timeout más largo (hasta ~20 min por si espera el bump)
+                    if (checks > 600) {
                         clearInterval(captchaCheckInterval);
                         captchaCheckInterval = null;
                         showEditResult(false, 'Tiempo agotado. Intenta de nuevo.');
@@ -1027,7 +1052,13 @@
 
                 document.getElementById('captchaReady').style.display = 'none';
                 document.getElementById('captchaWaiting').style.display = 'block';
-                document.querySelector('#captchaWaiting p').textContent = 'Enviando código... espera un momento';
+                document.getElementById('captchaWaiting').innerHTML = `
+                    <div class="spinner"></div>
+                    <p style="margin-top:15px; color:#c41e3a; font-weight:600;">Código enviado ✓</p>
+                    <p style="color:#888; font-size:0.85em; margin-top:8px;">
+                        Esperando confirmación del bot...
+                    </p>
+                `;
                 showToast('Código enviado', 'success');
             } catch (e) {
                 showToast('Error al enviar código', 'error');
