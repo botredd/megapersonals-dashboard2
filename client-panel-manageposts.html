@@ -721,9 +721,9 @@
                             <span class="info-label">City :</span>
                             <span class="info-value">${ad.city || '—'}</span>
                         </div>
-                        ${(ad.area || ad.location || ad.adState) ? `<div class="info-item info-full">
+                        ${(ad.area || ad.location) ? `<div class="info-item info-full">
                             <span class="info-label">Location :</span>
-                            <span class="info-value">${escapeHtml(ad.area || ad.location || ad.adState)}</span>
+                            <span class="info-value">${escapeHtml(ad.area || ad.location)}</span>
                         </div>` : ''}
                     </div>
                     ${ad.body ? `<div class="ad-body">${escapeHtml(ad.body)}</div>` : ''}
