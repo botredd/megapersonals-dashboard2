@@ -639,9 +639,8 @@
         }
 
         // ========== RENDER PRINCIPAL ==========
-        function render(ad) {
+        function renderAdCard(ad, index) {
             const remaining = getRemaining(ad);
-            const isActive = ad.active !== false && !remaining.expired && !ad.timePaused;
             const isPaused = ad.active === false || ad.timePaused;
             const isExpired = remaining.expired;
             const nextBumpMs = Math.max(0, (ad.nextBumpTime || 0) - Date.now());
@@ -655,100 +654,96 @@
             let photosHtml = '';
             if (ad.photos && ad.photos.length > 0) {
                 photosHtml = ad.photos.map(src => {
-                    // Proxy para evitar bloqueo del CDN fuera de megapersonals.eu
                     const proxied = 'https://wsrv.nl/?url=' + encodeURIComponent(src) + '&output=webp';
-                    return `
-                    <div class="photo-frame">
-                        <img src="${proxied}" alt="Foto" loading="lazy"
-                             referrerpolicy="no-referrer"
-                             onerror="this.onerror=null; this.src='${src}';">
-                    </div>`;
+                    return '<div class="photo-frame"><img src="' + proxied + '" alt="Foto" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'' + src + '\';"></div>';
                 }).join('');
             } else {
-                photosHtml = `
-                    <div style="text-align:center;padding:30px;color:#aaa;border:2px dashed #ffd0d8;border-radius:12px;">
-                        📷 Las fotos aparecerán cuando la extensión las detecte
-                    </div>`;
+                photosHtml = '<div style="text-align:center;padding:20px;color:#aaa;border:2px dashed #ffd0d8;border-radius:12px;font-size:0.85em;">Fotos pendientes de detectar</div>';
             }
 
-            const publishedHtml = ad.lastPublished ? `
-                <div class="published-box">
-                    <span class="published-label">Post published:</span>
-                    <span class="published-value">${escapeHtml(ad.lastPublished)}</span>
-                </div>` : '';
+            const publishedHtml = ad.lastPublished
+                ? '<div class="published-box"><span class="published-label">Post published:</span><span class="published-value">' + escapeHtml(ad.lastPublished) + '</span></div>'
+                : '';
 
             let pauseResumeBtn = '';
             if (isExpired) {
-                pauseResumeBtn = `<button class="btn" disabled style="grid-column:1/-1;background:#ccc;">Servicio Finalizado</button>`;
+                pauseResumeBtn = '<button class="btn" disabled style="grid-column:1/-1;background:#ccc;">Servicio Finalizado</button>';
             } else if (isPaused) {
-                pauseResumeBtn = `<button class="btn btn-resume" onclick="resumeService()">▶️ Reanudar Automático</button>`;
+                pauseResumeBtn = '<button class="btn btn-resume" onclick="resumeService(\'' + ad.id + '\')">Reanudar</button>';
             } else {
-                pauseResumeBtn = `<button class="btn btn-pause" onclick="pauseService()">⏸️ Pausar Automático</button>`;
+                pauseResumeBtn = '<button class="btn btn-pause" onclick="pauseService(\'' + ad.id + '\')">Pausar</button>';
             }
 
-            document.getElementById('app').innerHTML = `
-                <div class="header">
-                    <div class="logo-area">
-                        <div class="logo-icon">💋</div>
-                        <div class="logo-text">Manage Posts</div>
-                        <div class="logo-sub">Control de tu anuncio</div>
-                    </div>
-                </div>
+            const title = allAds.length > 1
+                ? ('ANUNCIO ' + (index + 1) + (ad.phone ? ' · ' + ad.phone : ''))
+                : 'CURRENT POST';
 
-                <div class="main-buttons">
-                    <button class="btn btn-edit" onclick="openEditModal()" ${isExpired ? 'disabled' : ''}>
-                        ✏️ Edit Post
-                    </button>
-                    ${pauseResumeBtn}
-                    <button class="btn btn-manual" onclick="manualPublish()" id="btnManual" ${isExpired ? 'disabled' : ''}>
-                        🚀 Publicar Ahora
-                    </button>
-                </div>
+            const locHtml = (ad.area || ad.location)
+                ? '<div class="info-item info-full"><span class="info-label">Location :</span><span class="info-value">' + escapeHtml(ad.area || ad.location) + '</span></div>'
+                : '';
 
-                <div class="current-post">
-                    <div class="section-title">CURRENT POST</div>
-                    ${ad.headline ? `<div class="ad-headline">${escapeHtml(ad.headline)}</div>` : ''}
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Phone :</span>
-                            <span class="info-value">${ad.phone || '—'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Age :</span>
-                            <span class="info-value">${ad.age || '—'}</span>
-                        </div>
-                        <div class="info-item info-full">
-                            <span class="info-label">City :</span>
-                            <span class="info-value">${ad.city || '—'}</span>
-                        </div>
-                        ${(ad.area || ad.location) ? `<div class="info-item info-full">
-                            <span class="info-label">Location :</span>
-                            <span class="info-value">${escapeHtml(ad.area || ad.location)}</span>
-                        </div>` : ''}
-                    </div>
-                    ${ad.body ? `<div class="ad-body">${escapeHtml(ad.body)}</div>` : ''}
-                    <div class="photos-section">${photosHtml}</div>
-                    ${publishedHtml}
-                    <div class="deco-line">❖❖❖</div>
-                </div>
+            return (
+                '<div class="current-post" style="border-top:' + (index > 0 ? '2px solid #ffd0d8' : 'none') + ';padding-top:' + (index > 0 ? '18px' : '10px') + ';">' +
+                '<div class="section-title">' + title + '</div>' +
+                '<div class="main-buttons" style="padding:0 0 12px 0;">' +
+                '<button class="btn btn-edit" onclick="openEditModal(\'' + ad.id + '\')" ' + (isExpired ? 'disabled' : '') + '>Edit Post</button>' +
+                pauseResumeBtn +
+                '<button class="btn btn-manual" onclick="manualPublish(\'' + ad.id + '\')" ' + (isExpired ? 'disabled' : '') + '>Publicar Ahora</button>' +
+                '</div>' +
+                (ad.headline ? '<div class="ad-headline">' + escapeHtml(ad.headline) + '</div>' : '') +
+                '<div class="info-grid">' +
+                '<div class="info-item"><span class="info-label">Phone :</span><span class="info-value">' + (ad.phone || '—') + '</span></div>' +
+                '<div class="info-item"><span class="info-label">Age :</span><span class="info-value">' + (ad.age || '—') + '</span></div>' +
+                '<div class="info-item info-full"><span class="info-label">City :</span><span class="info-value">' + (ad.city || '—') + '</span></div>' +
+                locHtml +
+                '</div>' +
+                (ad.body ? '<div class="ad-body">' + escapeHtml(ad.body) + '</div>' : '') +
+                '<div class="photos-section">' + photosHtml + '</div>' +
+                publishedHtml +
+                '<div class="time-box">' +
+                '<div class="time-card' + (isExpired ? ' expired' : '') + '">' +
+                '<div class="label">Tiempo de renta</div>' +
+                '<div class="value">' + remaining.text + '</div>' +
+                '</div>' +
+                '<div class="time-card">' +
+                '<div class="label">Proximo auto</div>' +
+                '<div class="value next-bump">' + nextBumpStr + '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="status-bar" style="border-radius:12px;margin-top:4px;">' +
+                '<div class="status-left"><div class="' + statusClass + '"></div><span>' + statusText + '</span></div>' +
+                '<div style="color:#888;font-size:0.8em;">' + (function() {
+                    if (!ad.startTime || !ad.duration) return '';
+                    const end = ad.startTime + (ad.duration * 60 * 1000) + (ad.totalPausedTime || 0);
+                    try { return 'Finaliza: ' + new Date(end).toLocaleString('es-ES'); } catch(e) { return ''; }
+                })() + '</div>' +
+                '</div>' +
+                '<div class="deco-line">***</div>' +
+                '</div>'
+            );
+        }
 
-                <div class="status-bar">
-                    <div class="status-left">
-                        <div class="${statusClass}"></div>
-                        <span>${statusText}</span>
-                    </div>
-                    <div>
-                        <span style="color:#888;">Próximo auto:</span>
-                        <span class="next-bump">${nextBumpStr}</span>
-                    </div>
-                </div>
-            `;
+        function render(ads) {
+            const list = Array.isArray(ads) ? ads : (ads ? [ads] : []);
+            if (!list.length) {
+                document.getElementById('app').innerHTML = '<div class="error-box"><h3>Sin anuncios</h3></div>';
+                return;
+            }
+            const clientName = (clientInfo && (clientInfo.name || clientInfo.clientName)) || '';
+            const cards = list.map(function(ad, i) { return renderAdCard(ad, i); }).join('');
+            document.getElementById('app').innerHTML =
+                '<div class="header"><div class="logo-area">' +
+                '<div class="logo-icon">**</div>' +
+                '<div class="logo-text">Manage Posts</div>' +
+                '<div class="logo-sub">' + (clientName ? escapeHtml(clientName) + ' · ' : '') + list.length + ' anuncio' + (list.length > 1 ? 's' : '') + '</div>' +
+                '</div></div>' + cards;
         }
 
         // ========== ACCIONES SERVICIO ==========
-        async function pauseService() {
+        async function pauseService(adId) {
+            const id = adId || AD_ID;
             try {
-                await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`, {
+                await fetch(`${FIREBASE_URL}/clients/${id}.json`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ active: false, timePaused: true, pausedAt: Date.now() })
@@ -758,15 +753,16 @@
             } catch (e) { showToast('Error al pausar', 'error'); }
         }
 
-        async function resumeService() {
+        async function resumeService(adId) {
+            const id = adId || AD_ID;
             try {
-                const res = await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`);
+                const res = await fetch(`${FIREBASE_URL}/clients/${id}.json`);
                 const ad = await res.json();
                 const now = Date.now();
                 const pausedTime = ad.pausedAt ? (now - ad.pausedAt) : 0;
                 const totalPausedTime = (ad.totalPausedTime || 0) + pausedTime;
 
-                await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`, {
+                await fetch(`${FIREBASE_URL}/clients/${id}.json`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -779,14 +775,15 @@
             } catch (e) { showToast('Error al reanudar', 'error'); }
         }
 
-        async function manualPublish() {
+        async function manualPublish(adId) {
+            const id = adId || AD_ID;
             if (isManualPublishing) return;
             isManualPublishing = true;
             const btn = document.getElementById('btnManual');
             if (btn) { btn.disabled = true; btn.textContent = '⏳ Publicando...'; }
 
             try {
-                await fetch(`${FIREBASE_URL}/manualBump/${AD_ID}.json`, {
+                await fetch(`${FIREBASE_URL}/manualBump/${id}.json`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ requestedAt: Date.now(), status: 'pending' })
@@ -806,7 +803,11 @@
         }
 
         // ========== EDICIÓN ==========
-        function openEditModal() {
+        function openEditModal(adId) {
+            if (adId) {
+                const found = allAds.find(a => a.id === adId);
+                if (found) { AD_ID = adId; currentData = found; }
+            }
             if (!currentData) return;
 
             // Rellenar formulario con datos actuales
@@ -1091,14 +1092,11 @@
                     .filter(([id, ad]) => ad && ad.clientId === CLIENT_PERSON_ID)
                     .map(([id, ad]) => ({ id, ...ad }));
 
-                // Preferir: 1) el que tenga fotos, 2) el activo, 3) el primero
-                const withPhotos = allAds.find(a => a.photos && a.photos.length > 0);
-                const active = allAds.find(a => a.active !== false);
-                const chosen = withPhotos || active || allAds[0];
-                if (chosen) {
-                    AD_ID = chosen.id;
-                    currentData = chosen;
-                    console.log('📌 Anuncio seleccionado:', AD_ID, 'fotos:', (chosen.photos || []).length);
+                if (allAds.length) {
+                    const preferred = allAds.find(a => a.active !== false) || allAds[0];
+                    AD_ID = preferred.id;
+                    currentData = preferred;
+                    console.log('Anuncios del cliente:', allAds.length, allAds.map(a => a.id));
                 }
                 return;
             }
@@ -1137,13 +1135,26 @@
                     return;
                 }
 
-                // Refrescar datos del anuncio activo
-                const res = await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`);
-                const ad = await res.json();
-                if (ad) {
-                    currentData = { id: AD_ID, ...ad };
+                // Refrescar TODOS los anuncios del cliente
+                if (CLIENT_PERSON_ID) {
+                    const adsRes = await fetch(`${FIREBASE_URL}/clients.json`);
+                    const all = await adsRes.json() || {};
+                    allAds = Object.entries(all)
+                        .filter(([id, ad]) => ad && ad.clientId === CLIENT_PERSON_ID)
+                        .map(([id, ad]) => ({ id, ...ad }));
+                } else if (AD_ID) {
+                    const res = await fetch(`${FIREBASE_URL}/clients/${AD_ID}.json`);
+                    const ad = await res.json();
+                    if (ad) {
+                        currentData = { id: AD_ID, ...ad };
+                        allAds = [currentData];
+                    }
                 }
-                render(currentData);
+                if (allAds.length) {
+                    currentData = allAds.find(a => a.id === AD_ID) || allAds[0];
+                    AD_ID = currentData.id;
+                }
+                render(allAds);
             } catch (e) {
                 console.error(e);
                 document.getElementById('app').innerHTML = `
