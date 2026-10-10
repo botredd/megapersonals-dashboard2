@@ -153,6 +153,42 @@
         .published-value { color: #c41e3a; font-weight: 600; }
         .deco-line { text-align: center; margin: 12px 0; color: #c41e3a; font-size: 1.4em; letter-spacing: 4px; }
 
+        .time-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 4px 8px;
+        }
+        .time-card {
+            background: #fff;
+            border: 1.5px solid #ffc9d4;
+            border-radius: 14px;
+            padding: 14px 12px 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.06);
+        }
+        .time-card .label {
+            display: block;
+            font-size: 0.68em;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #c41e3a;
+            font-weight: 600;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        .time-card .value {
+            display: block;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #2d2d2d;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.02em;
+            line-height: 1.25;
+        }
+        .time-card.expired .value { color: #aaa; }
+        .time-card .value.next-bump { color: #c41e3a; }
+
         .status-bar {
             background: #fff0f3; border-top: 1px solid #ffd0d8;
             padding: 14px 18px; display: flex;
@@ -706,16 +742,19 @@
                 '<div class="value">' + remaining.text + '</div>' +
                 '</div>' +
                 '<div class="time-card">' +
-                '<div class="label">Proximo auto</div>' +
+                '<div class="label">Próximo auto</div>' +
                 '<div class="value next-bump">' + nextBumpStr + '</div>' +
                 '</div>' +
                 '</div>' +
-                '<div class="status-bar" style="border-radius:12px;margin-top:4px;">' +
-                '<div class="status-left"><div class="' + statusClass + '"></div><span>' + statusText + '</span></div>' +
-                '<div style="color:#888;font-size:0.8em;">' + (function() {
+                '<div class="status-bar" style="border-radius:12px;margin-top:10px;padding:10px 14px;">' +
+                '<div class="status-left"><div class="' + statusClass + '"></div><span style="font-weight:600;">' + statusText + '</span></div>' +
+                '<div style="color:#999;font-size:0.75em;">' + (function() {
                     if (!ad.startTime || !ad.duration) return '';
                     const end = ad.startTime + (ad.duration * 60 * 1000) + (ad.totalPausedTime || 0);
-                    try { return 'Finaliza: ' + new Date(end).toLocaleString('es-ES'); } catch(e) { return ''; }
+                    try {
+                        return 'Finaliza ' + new Date(end).toLocaleDateString('es-ES', {day:'2-digit',month:'short'}) +
+                               ' · ' + new Date(end).toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit'});
+                    } catch(e) { return ''; }
                 })() + '</div>' +
                 '</div>' +
                 '<div class="deco-line">***</div>' +
